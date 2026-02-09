@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plant Health Monitor</title>
+    <title>Plant Health Monitor - AI Powered</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -15,7 +15,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1e293b, #334155);
+            background: linear-gradient(135deg, #0a0e27, #1a1f3a);
             min-height: 100vh;
             color: white;
         }
@@ -28,25 +28,26 @@
 
         .tab-navigation {
             display: flex;
-            background: rgba(15, 23, 42, 0.9);
-            border-bottom: 2px solid #3b82f6;
+            background: rgba(10, 14, 39, 0.95);
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
             padding: 15px 20px;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
             position: sticky;
             top: 0;
-            z-index: 1000;
         }
 
         .tab-btn {
             flex: 1;
-            min-width: 120px;
-            padding: 12px 20px;
-            background: rgba(51, 65, 85, 0.8);
+            min-width: 110px;
+            padding: 12px 15px;
+            background: rgba(30, 41, 59, 0.8);
             border: 2px solid transparent;
-            border-radius: 8px;
+            border-radius: 12px;
             color: white;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -58,12 +59,24 @@
 
         .tab-btn:hover {
             background: rgba(59, 130, 246, 0.2);
-            border-color: #3b82f6;
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
         }
 
         .tab-btn.active {
-            background: #3b82f6;
-            border-color: #60a5fa;
+            background: rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), inset 0 0 20px rgba(59, 130, 246, 0.2);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), inset 0 0 20px rgba(59, 130, 246, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(59, 130, 246, 0.7), inset 0 0 30px rgba(59, 130, 246, 0.3);
+            }
         }
 
         .tab-content {
@@ -77,49 +90,6 @@
             display: block;
         }
 
-        .api-key-section {
-            background: rgba(59, 130, 246, 0.1);
-            border: 2px solid #3b82f6;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .api-key-section.hidden {
-            display: none;
-        }
-
-        .api-input {
-            width: 100%;
-            max-width: 500px;
-            padding: 12px 20px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid #3b82f6;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-            margin: 10px 0;
-        }
-
-        .api-status {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-
-        .api-status.success {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid #22c55e;
-            color: #22c55e;
-        }
-
-        .api-status.error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
-            color: #ef4444;
-        }
-
         .analyzer-container {
             max-width: 1000px;
             margin: 0 auto;
@@ -127,25 +97,27 @@
         }
 
         .upload-section {
-            background: rgba(51, 65, 85, 0.8);
+            background: rgba(30, 41, 59, 0.8);
             border: 2px solid #3b82f6;
-            border-radius: 12px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 40px;
             text-align: center;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
             margin-bottom: 30px;
         }
 
         .upload-section h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
+            font-size: 28px;
+            margin-bottom: 20px;
             color: #3b82f6;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
         }
 
         .upload-box {
-            border: 2px dashed #3b82f6;
-            border-radius: 12px;
-            padding: 40px;
-            margin: 20px 0;
+            border: 3px dashed #3b82f6;
+            border-radius: 15px;
+            padding: 50px;
+            margin: 30px 0;
             background: rgba(59, 130, 246, 0.05);
             cursor: pointer;
             transition: all 0.3s;
@@ -154,12 +126,13 @@
         .upload-box:hover {
             background: rgba(59, 130, 246, 0.1);
             border-color: #60a5fa;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
         }
 
         .upload-box i {
-            font-size: 50px;
+            font-size: 60px;
             color: #3b82f6;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         #plantImageInput {
@@ -174,29 +147,31 @@
         .image-preview-large {
             max-width: 100%;
             max-height: 400px;
-            border-radius: 12px;
-            border: 2px solid #3b82f6;
+            border-radius: 15px;
+            border: 3px solid #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
         }
 
         .action-btn {
-            background: #3b82f6;
-            border: none;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: 2px solid #3b82f6;
             color: white;
-            padding: 12px 30px;
-            font-size: 16px;
+            padding: 15px 40px;
+            font-size: 18px;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             margin: 10px;
         }
 
         .action-btn:hover:not(:disabled) {
-            background: #2563eb;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.6);
         }
 
         .action-btn:disabled {
@@ -205,183 +180,401 @@
         }
 
         .ai-detail-btn {
-            background: #8b5cf6;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
         }
 
         .ai-detail-btn:hover:not(:disabled) {
-            background: #7c3aed;
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.6);
         }
 
         .results-panel {
-            background: rgba(51, 65, 85, 0.9);
+            background: rgba(30, 41, 59, 0.9);
             border: 2px solid #3b82f6;
-            border-radius: 12px;
-            padding: 25px;
+            border-radius: 20px;
+            padding: 30px;
             margin-top: 30px;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
             display: none;
         }
 
         .plant-identity {
             background: rgba(59, 130, 246, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #3b82f6;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #3b82f6;
         }
 
         .plant-name {
-            font-size: 28px;
+            font-size: 32px;
             color: #3b82f6;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 700;
         }
 
         .scientific-name {
-            font-size: 16px;
+            font-size: 18px;
             color: #94a3b8;
             font-style: italic;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
 
         .confidence-bar {
-            background: rgba(15, 23, 42, 0.5);
-            height: 25px;
-            border-radius: 12px;
+            background: rgba(10, 14, 39, 0.5);
+            height: 30px;
+            border-radius: 15px;
             overflow: hidden;
-            margin-top: 12px;
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            margin-top: 15px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
         }
 
         .confidence-fill {
             height: 100%;
-            background: #3b82f6;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            transition: width 0.8s ease;
+            font-weight: 700;
+            transition: width 1s ease;
         }
 
         .health-assessment {
             background: rgba(34, 197, 94, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #22c55e;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #22c55e;
         }
 
         .health-score {
-            font-size: 42px;
-            font-weight: 700;
+            font-size: 48px;
+            font-weight: 800;
             color: #22c55e;
             text-align: center;
-            margin: 15px 0;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
         }
 
         .disease-section {
             background: rgba(239, 68, 68, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #ef4444;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #ef4444;
         }
 
         .disease-card {
-            background: rgba(51, 65, 85, 0.5);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 12px 0;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(30, 41, 59, 0.5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border: 2px solid rgba(239, 68, 68, 0.3);
         }
 
         .disease-name {
-            font-size: 18px;
+            font-size: 22px;
             color: #ef4444;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
         }
 
         .probability-badge {
             display: inline-block;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 13px;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 600;
             margin: 5px;
         }
 
         .prob-high {
             background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
+            border: 2px solid #ef4444;
             color: #ef4444;
         }
 
         .prob-medium {
             background: rgba(249, 115, 22, 0.2);
-            border: 1px solid #f97316;
+            border: 2px solid #f97316;
             color: #f97316;
         }
 
         .prob-low {
             background: rgba(251, 191, 36, 0.2);
-            border: 1px solid #fbbf24;
+            border: 2px solid #fbbf24;
             color: #fbbf24;
         }
 
         .ai-details-panel {
             background: rgba(139, 92, 246, 0.1);
             border: 2px solid #8b5cf6;
-            border-radius: 12px;
-            padding: 25px;
+            border-radius: 20px;
+            padding: 30px;
             margin-top: 30px;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
             display: none;
         }
 
         .ai-section {
-            background: rgba(51, 65, 85, 0.5);
-            padding: 18px;
-            border-radius: 10px;
-            margin: 12px 0;
-            border-left: 3px solid #8b5cf6;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #8b5cf6;
         }
 
         .ai-section h3 {
             color: #a78bfa;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 18px;
+            gap: 10px;
+            font-size: 20px;
         }
 
         .ai-content {
             color: #e2e8f0;
-            line-height: 1.7;
-            font-size: 14px;
+            line-height: 1.8;
+            font-size: 15px;
         }
 
         .ai-content p {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .ai-content ul, .ai-content ol {
             margin-left: 20px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .ai-content li {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            padding-left: 10px;
         }
 
         .ai-content strong {
             color: #a78bfa;
         }
 
+        /* Alert Styles */
+        .alert-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .alert-header {
+            background: rgba(239, 68, 68, 0.15);
+            border: 2px solid #ef4444;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
+        }
+
+        .alert-header h1 {
+            font-size: 42px;
+            color: #ef4444;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .alert-header p {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+
+        .location-selector {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid #3b82f6;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .location-selector h3 {
+            color: #3b82f6;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .location-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(10, 14, 39, 0.8);
+            border: 2px solid #3b82f6;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .alert-display {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #ef4444;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
+            display: none;
+        }
+
+        .alert-main-warning {
+            background: rgba(239, 68, 68, 0.2);
+            border: 3px solid #ef4444;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(239, 68, 68, 0.6);
+            }
+        }
+
+        .alert-main-warning h2 {
+            font-size: 32px;
+            color: #ef4444;
+            margin-bottom: 15px;
+        }
+
+        .alert-main-warning .severity {
+            display: inline-block;
+            padding: 10px 25px;
+            background: #ef4444;
+            color: white;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid #3b82f6;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .info-card h3 {
+            color: #3b82f6;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-card li {
+            padding: 10px 0;
+            color: #e2e8f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .info-card li:last-child {
+            border-bottom: none;
+        }
+
+        .info-card li:before {
+            content: "•";
+            color: #3b82f6;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .integration-section {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid #8b5cf6;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .integration-section h3 {
+            color: #a78bfa;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .integration-box {
+            background: rgba(30, 41, 59, 0.6);
+            border: 2px solid #8b5cf6;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .integration-box i {
+            font-size: 40px;
+            color: #a78bfa;
+            margin-bottom: 10px;
+        }
+
+        .integration-box h4 {
+            color: #a78bfa;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .integration-note {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #94a3b8;
+        }
+
         #map {
             width: 100%;
             height: calc(100vh - 100px);
-            border-radius: 12px;
+            border-radius: 15px;
             border: 2px solid #3b82f6;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
         }
 
         .map-controls {
@@ -391,9 +584,10 @@
             z-index: 1000;
             background: rgba(30, 41, 59, 0.95);
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 15px;
             border: 2px solid #3b82f6;
-            max-width: 300px;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+            max-width: 320px;
         }
 
         .map-controls h3 {
@@ -405,54 +599,56 @@
         .map-mode-toggle {
             display: flex;
             gap: 8px;
-            margin-bottom: 15px;
-            background: rgba(15, 23, 42, 0.5);
-            padding: 10px;
-            border-radius: 8px;
+            margin-bottom: 20px;
+            background: rgba(10, 14, 39, 0.5);
+            padding: 12px;
+            border-radius: 10px;
         }
 
         .mode-btn {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             background: rgba(59, 130, 246, 0.2);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.3);
             color: white;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 13px;
             transition: all 0.3s;
             text-align: center;
         }
 
         .mode-btn:hover {
             background: rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
         }
 
         .mode-btn.active {
             background: #3b82f6;
             border-color: #60a5fa;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
         }
 
         .control-group {
-            margin: 12px 0;
+            margin: 15px 0;
         }
 
         .control-label {
             display: block;
             margin-bottom: 8px;
             color: #94a3b8;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         select, input[type="date"] {
             width: 100%;
             padding: 10px;
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(10, 14, 39, 0.8);
             border: 2px solid #3b82f6;
-            border-radius: 6px;
+            border-radius: 8px;
             color: white;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .small-btn {
@@ -462,7 +658,7 @@
             background: rgba(59, 130, 246, 0.2);
             border: 2px solid #3b82f6;
             color: white;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
@@ -470,6 +666,7 @@
 
         .small-btn:hover {
             background: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
         }
 
         .ndvi-info {
@@ -479,17 +676,19 @@
             z-index: 1000;
             background: rgba(30, 41, 59, 0.95);
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 15px;
             border: 2px solid #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
             display: none;
         }
 
         .ndvi-value-display {
-            font-size: 40px;
-            font-weight: 700;
+            font-size: 48px;
+            font-weight: 800;
             text-align: center;
             color: #3b82f6;
-            margin: 12px 0;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            margin: 15px 0;
         }
 
         .weather-container {
@@ -499,50 +698,53 @@
         }
 
         .weather-search {
-            background: rgba(51, 65, 85, 0.8);
+            background: rgba(30, 41, 59, 0.8);
             border: 2px solid #3b82f6;
-            border-radius: 12px;
-            padding: 25px;
+            border-radius: 15px;
+            padding: 30px;
             margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 20px;
-            background: rgba(15, 23, 42, 0.8);
+            padding: 15px 20px;
+            background: rgba(10, 14, 39, 0.8);
             border: 2px solid #3b82f6;
-            border-radius: 8px;
+            border-radius: 10px;
             color: white;
-            font-size: 15px;
+            font-size: 16px;
             margin-bottom: 15px;
         }
 
         .weather-display {
-            background: rgba(51, 65, 85, 0.8);
+            background: rgba(30, 41, 59, 0.8);
             border: 2px solid #3b82f6;
-            border-radius: 12px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
             display: none;
         }
 
         .weather-main {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .weather-icon {
-            font-size: 80px;
-            margin: 15px 0;
+            font-size: 100px;
+            margin: 20px 0;
         }
 
         .temperature {
-            font-size: 60px;
-            font-weight: 700;
+            font-size: 72px;
+            font-weight: 800;
             color: #3b82f6;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
         }
 
         .weather-description {
-            font-size: 20px;
+            font-size: 24px;
             color: #94a3b8;
             margin: 10px 0;
             text-transform: capitalize;
@@ -551,38 +753,39 @@
         .weather-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 25px;
+            gap: 20px;
+            margin-top: 30px;
         }
 
         .detail-card {
             background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 10px;
-            padding: 18px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 15px;
+            padding: 20px;
             text-align: center;
             transition: all 0.3s;
         }
 
         .detail-card:hover {
             border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
         }
 
         .detail-icon {
-            font-size: 32px;
+            font-size: 36px;
             color: #3b82f6;
             margin-bottom: 10px;
         }
 
         .detail-value {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 28px;
+            font-weight: 700;
             color: white;
-            margin: 8px 0;
+            margin: 10px 0;
         }
 
         .detail-label {
-            font-size: 13px;
+            font-size: 14px;
             color: #94a3b8;
         }
 
@@ -592,7 +795,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(10, 14, 39, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -602,10 +805,10 @@
         }
 
         .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(59, 130, 246, 0.3);
-            border-top: 4px solid #3b82f6;
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(59, 130, 246, 0.3);
+            border-top: 5px solid #3b82f6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -617,7 +820,7 @@
 
         .loading-text {
             margin-top: 20px;
-            font-size: 16px;
+            font-size: 18px;
             color: #3b82f6;
         }
 
@@ -627,13 +830,14 @@
             right: 20px;
             background: rgba(30, 41, 59, 0.95);
             border: 2px solid #3b82f6;
-            border-radius: 8px;
-            padding: 12px 20px;
+            border-radius: 10px;
+            padding: 15px 25px;
             color: white;
             z-index: 10000;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
             animation: slideIn 0.3s ease;
             display: none;
-            max-width: 350px;
+            max-width: 400px;
         }
 
         @keyframes slideIn {
@@ -649,120 +853,76 @@
 
         @media (max-width: 768px) {
             .tab-btn {
-                min-width: 100px;
-                padding: 10px 15px;
-                font-size: 13px;
+                min-width: 90px;
+                padding: 10px 12px;
+                font-size: 12px;
             }
-
             .upload-section {
                 padding: 20px;
             }
-
             .upload-box {
                 padding: 30px;
             }
-
             .plant-name {
-                font-size: 22px;
+                font-size: 24px;
             }
-
             .health-score {
-                font-size: 32px;
+                font-size: 36px;
             }
-
             .temperature {
-                font-size: 48px;
+                font-size: 56px;
             }
-
             .action-btn {
-                padding: 10px 20px;
-                font-size: 14px;
+                padding: 12px 25px;
+                font-size: 16px;
             }
-
             .map-controls {
-                max-width: 260px;
+                max-width: 280px;
+            }
+            .mode-btn {
+                font-size: 11px;
+                padding: 8px;
+            }
+            .integration-grid {
+                grid-template-columns: 1fr;
+            }
+            .alert-header h1 {
+                font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- TAB NAVIGATION -->
         <div class="tab-navigation">
             <button class="tab-btn active" onclick="switchTab('plant')" id="plantTab">
-                <i class="fas fa-leaf"></i> Plant Analyzer
+                <i class="fas fa-leaf"></i> Plant
             </button>
             <button class="tab-btn" onclick="switchTab('ndvi')" id="ndviTab">
-                <i class="fas fa-map"></i> NDVI Map
+                <i class="fas fa-map"></i> NDVI
             </button>
             <button class="tab-btn" onclick="switchTab('weather')" id="weatherTab">
                 <i class="fas fa-cloud-sun"></i> Weather
             </button>
+            <button class="tab-btn" onclick="switchTab('alert')" id="alertTab">
+                <i class="fas fa-exclamation-triangle"></i> Alert
+            </button>
         </div>
 
-        <!-- TAB 1: PLANT ANALYZER -->
+        <!-- Plant Analyzer Tab -->
         <div class="tab-content active" id="plantContent">
             <div class="analyzer-container">
-                <!-- KINDWISE API KEY -->
-                <div class="api-key-section" id="kindwiseApiSection">
-                    <h3 style="color: #3b82f6; margin-bottom: 12px;">
-                        <i class="fas fa-key"></i> Setup Kindwise Plant.id API
-                    </h3>
-                    <p style="color: #94a3b8; margin-bottom: 12px;">
-                        Enter your Kindwise Plant.id API key for plant identification
-                    </p>
-                    <input 
-                        type="text" 
-                        class="api-input" 
-                        id="kindwiseApiKeyInput" 
-                        placeholder="Paste Kindwise API key here"
-                    >
-                    <button class="action-btn" onclick="saveKindwiseApiKey()">
-                        <i class="fas fa-save"></i> Save Key
-                    </button>
-                    <div id="kindwiseApiStatus" class="api-status" style="display: none;"></div>
-                    <p style="color: #94a3b8; margin-top: 12px; font-size: 13px;">
-                        Get free API key: 
-                        <a href="https://web.plant.id/api-access/" target="_blank" style="color: #3b82f6;">Kindwise Plant.id</a>
-                    </p>
-                </div>
-
-                <!-- GROQ API KEY -->
-                <div class="api-key-section" id="groqApiSection">
-                    <h3 style="color: #8b5cf6; margin-bottom: 12px;">
-                        <i class="fas fa-brain"></i> Setup Groq AI (Optional)
-                    </h3>
-                    <p style="color: #94a3b8; margin-bottom: 12px;">
-                        Get detailed AI analysis about detected diseases
-                    </p>
-                    <input 
-                        type="text" 
-                        class="api-input" 
-                        id="groqApiKeyInput" 
-                        placeholder="Paste Groq API key here (starts with gsk_...)"
-                    >
-                    <button class="action-btn ai-detail-btn" onclick="saveGroqApiKey()">
-                        <i class="fas fa-save"></i> Save Key
-                    </button>
-                    <div id="groqApiStatus" class="api-status" style="display: none;"></div>
-                    <p style="color: #94a3b8; margin-top: 12px; font-size: 13px;">
-                        Get FREE API key: 
-                        <a href="https://console.groq.com/keys" target="_blank" style="color: #8b5cf6;">Groq Console</a>
-                    </p>
-                </div>
-
-                <!-- UPLOAD SECTION -->
                 <div class="upload-section">
                     <h2><i class="fas fa-microscope"></i> Plant Disease Analyzer</h2>
-                    <p style="color: #94a3b8; margin-bottom: 15px;">
-                        Upload plant image for analysis
+                    <p style="color: #94a3b8; margin-bottom: 20px;">
+                        Powered by Kindwise Plant.id + Groq AI
                     </p>
                     
                     <label for="plantImageInput">
                         <div class="upload-box">
                             <i class="fas fa-cloud-upload-alt"></i>
                             <h3 style="color: #3b82f6;">Click to Upload Image</h3>
-                            <p style="color: #94a3b8; margin-top: 8px;">or drag and drop</p>
+                            <p style="color: #94a3b8; margin-top: 10px;">or drag and drop</p>
                             <p style="color: #94a3b8; font-size: 12px; margin-top: 5px;">Supports JPG, PNG (max 5MB)</p>
                         </div>
                     </label>
@@ -770,24 +930,23 @@
 
                     <div class="preview-container" id="previewContainer">
                         <img id="imagePreview" class="image-preview-large" alt="Plant preview">
-                        <div style="margin-top: 15px;">
-                            <button class="action-btn" onclick="analyzePlantKindwise()" id="analyzeBtn">
+                        <div style="margin-top: 20px;">
+                            <button class="action-btn" onclick="analyzePlant()" id="analyzeBtn">
                                 <i class="fas fa-search"></i> Analyze Plant
                             </button>
-                            <button class="action-btn" onclick="clearImage()" style="background: #ef4444;">
+                            <button class="action-btn" onclick="clearImagePreview()" style="background: rgba(239, 68, 68, 0.3); border-color: #ef4444;">
                                 <i class="fas fa-times"></i> Clear
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- RESULTS -->
                 <div class="results-panel" id="resultsPanel"></div>
                 <div class="ai-details-panel" id="aiDetailsPanel"></div>
             </div>
         </div>
 
-        <!-- TAB 2: NDVI MAP -->
+        <!-- NDVI Map Tab -->
         <div class="tab-content" id="ndviContent">
             <div style="position: relative; height: calc(100vh - 100px);">
                 <div id="map"></div>
@@ -796,20 +955,20 @@
                     <h3><i class="fas fa-cog"></i> Map Controls</h3>
                     
                     <div class="map-mode-toggle">
-                        <div class="mode-btn active" id="streetModeBtn" onclick="switchMapMode('street')">
+                        <div class="mode-btn active" id="streetModeBtn" onclick="changeMapMode('street')">
                             <i class="fas fa-map"></i> Street
                         </div>
-                        <div class="mode-btn" id="satelliteModeBtn" onclick="switchMapMode('satellite')">
+                        <div class="mode-btn" id="satelliteModeBtn" onclick="changeMapMode('satellite')">
                             <i class="fas fa-globe"></i> Satellite
                         </div>
-                        <div class="mode-btn" id="ndviModeBtn" onclick="switchMapMode('ndvi')">
+                        <div class="mode-btn" id="ndviModeBtn" onclick="changeMapMode('ndvi')">
                             <i class="fas fa-chart-line"></i> NDVI
                         </div>
                     </div>
                     
                     <div class="control-group">
                         <label class="control-label">Sensor Type</label>
-                        <select id="sensorSelect" onchange="changeSensor()">
+                        <select id="sensorSelect" onchange="updateSensor()">
                             <option value="landsat">Landsat 8 (30m)</option>
                             <option value="sentinel">Sentinel-2 (10m)</option>
                         </select>
@@ -820,17 +979,17 @@
                         <input type="date" id="ndviDatePicker">
                     </div>
 
-                    <button class="small-btn" onclick="loadNDVIData()">
+                    <button class="small-btn" onclick="loadNdviData()">
                         <i class="fas fa-sync"></i> Load NDVI Data
                     </button>
 
-                    <button class="small-btn" onclick="getLatestNDVI()">
+                    <button class="small-btn" onclick="loadLatestNdvi()">
                         <i class="fas fa-calendar"></i> Latest Data
                     </button>
                 </div>
 
                 <div class="ndvi-info" id="ndviInfo">
-                    <h3 style="color: #3b82f6; margin-bottom: 12px;">
+                    <h3 style="color: #3b82f6; margin-bottom: 15px;">
                         <i class="fas fa-seedling"></i> Vegetation Health
                     </h3>
                     <div class="ndvi-value-display" id="ndviValue">--</div>
@@ -841,53 +1000,61 @@
             </div>
         </div>
 
-        <!-- TAB 3: WEATHER -->
+        <!-- Weather Tab -->
         <div class="tab-content" id="weatherContent">
             <div class="weather-container">
-                <div class="api-key-section" id="weatherApiSection">
-                    <h3 style="color: #3b82f6; margin-bottom: 12px;">
-                        <i class="fas fa-cloud"></i> Setup OpenWeather API (Optional)
-                    </h3>
-                    <p style="color: #94a3b8; margin-bottom: 12px;">
-                        Enter your OpenWeather API key for real-time weather data
-                    </p>
-                    <input 
-                        type="text" 
-                        class="api-input" 
-                        id="weatherApiKeyInput" 
-                        placeholder="Paste OpenWeather API key here"
-                    >
-                    <button class="action-btn" onclick="saveWeatherApiKey()">
-                        <i class="fas fa-save"></i> Save Key
-                    </button>
-                    <div id="weatherApiStatus" class="api-status" style="display: none;"></div>
-                    <p style="color: #94a3b8; margin-top: 12px; font-size: 13px;">
-                        Get free API key: 
-                        <a href="https://openweathermap.org/api" target="_blank" style="color: #3b82f6;">OpenWeatherMap</a>
-                        (Demo data shown without API key)
-                    </p>
-                </div>
-
                 <div class="weather-search">
-                    <h2 style="color: #3b82f6; margin-bottom: 15px;">
+                    <h2 style="color: #3b82f6; margin-bottom: 20px;">
                         <i class="fas fa-search-location"></i> Weather Forecast
                     </h2>
                     <input 
                         type="text" 
                         class="search-input" 
                         id="cityInput" 
-                        placeholder="Enter city name (e.g., Mumbai, Delhi)"
-                        onkeypress="if(event.key==='Enter') getWeather()"
+                        placeholder="Enter city name (e.g., Mumbai, Delhi, Bangalore)"
+                        onkeypress="if(event.key==='Enter') fetchWeather()"
                     >
-                    <button class="action-btn" onclick="getWeather()" style="width: 100%;">
+                    <button class="action-btn" onclick="fetchWeather()" style="width: 100%;">
                         <i class="fas fa-search"></i> Get Weather
                     </button>
-                    <button class="action-btn" onclick="getCurrentLocationWeather()" style="width: 100%; background: #22c55e;">
+                    <button class="action-btn" onclick="fetchLocationWeather()" style="width: 100%; background: rgba(34, 197, 94, 0.3); border-color: #22c55e;">
                         <i class="fas fa-location-arrow"></i> Use Current Location
                     </button>
                 </div>
 
                 <div class="weather-display" id="weatherDisplay"></div>
+            </div>
+        </div>
+
+        <!-- Regional Alert Tab -->
+        <div class="tab-content" id="alertContent">
+            <div class="alert-container">
+                <div class="alert-header">
+                    <h1>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Regional Disease Alert
+                    </h1>
+                    <p>Smart disease prediction based on location, season, and weather conditions</p>
+                </div>
+
+                <div class="location-selector">
+                    <h3><i class="fas fa-map-marker-alt"></i> Enter Your Location</h3>
+                    <input 
+                        type="text" 
+                        class="location-input" 
+                        id="alertLocationInput" 
+                        placeholder="Enter city or region (e.g., Mumbai, Maharashtra)"
+                        onkeypress="if(event.key==='Enter') generateAlert()"
+                    >
+                    <button class="action-btn" onclick="generateAlert()" style="width: 100%;">
+                        <i class="fas fa-search"></i> Get Disease Alert
+                    </button>
+                    <button class="action-btn" onclick="generateAlertForLocation()" style="width: 100%; background: rgba(34, 197, 94, 0.3); border-color: #22c55e;">
+                        <i class="fas fa-location-arrow"></i> Use My Current Location
+                    </button>
+                </div>
+
+                <div class="alert-display" id="alertDisplay"></div>
             </div>
         </div>
     </div>
@@ -901,587 +1068,636 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        let map = null;
-        let ndviLayer = null;
-        let currentSensor = 'landsat';
-        let streetLayer = null;
-        let satelliteLayer = null;
-        let currentMapMode = 'street';
-        let KINDWISE_API_KEY = '';
-        let GROQ_API_KEY = '';
-        let WEATHER_API_KEY = '';
-        let currentDiseaseData = null;
+        // Configuration - Add your API keys here
+        const CONFIG = {
+            KINDWISE_API_KEY: 'ENTER_KINDWISE_API_KEY',  // Get from: https://web.plant.id/api-access/
+            GROQ_API_KEY: 'ENTER_GROQ_API_KEY',          // Get from: https://console.groq.com/keys
+            WEATHER_API_KEY: 'ENTER_OPENWEATHER_API_KEY'                               // Optional: Get from https://openweathermap.org/api
+        };
 
-        function checkApiKeys() {
-            const kindwiseKey = localStorage.getItem('kindwise_api_key');
-            const groqKey = localStorage.getItem('groq_api_key');
-            const weatherKey = localStorage.getItem('weather_api_key');
-            
-            if (kindwiseKey) {
-                KINDWISE_API_KEY = kindwiseKey;
-                document.getElementById('kindwiseApiSection').classList.add('hidden');
-                document.getElementById('analyzeBtn').disabled = false;
-            } else {
-                document.getElementById('analyzeBtn').disabled = true;
-            }
+        // Global variables
+        var leafletMap = null;
+        var currentMapLayer = null;
+        var selectedSensor = 'landsat';
+        var mapStreetTiles = null;
+        var mapSatelliteTiles = null;
+        var currentViewMode = 'street';
+        var plantAnalysisData = null;
+        var userLocation = null;
 
-            if (groqKey) {
-                GROQ_API_KEY = groqKey;
-                document.getElementById('groqApiSection').classList.add('hidden');
-            }
+        // Initialize the app
+        window.addEventListener('load', function() {
+            displayMessage('Welcome to Plant Health Monitor!', 'success');
+        });
 
-            if (weatherKey) {
-                WEATHER_API_KEY = weatherKey;
-                document.getElementById('weatherApiSection').classList.add('hidden');
-            }
-        }
-
-        function saveKindwiseApiKey() {
-            const apiKey = document.getElementById('kindwiseApiKeyInput').value.trim();
-            const statusEl = document.getElementById('kindwiseApiStatus');
-            
-            if (!apiKey || apiKey.length < 20) {
-                statusEl.className = 'api-status error';
-                statusEl.textContent = 'Please enter a valid API key';
-                statusEl.style.display = 'block';
-                return;
-            }
-
-            localStorage.setItem('kindwise_api_key', apiKey);
-            KINDWISE_API_KEY = apiKey;
-
-            statusEl.className = 'api-status success';
-            statusEl.textContent = '✓ API Key saved!';
-            statusEl.style.display = 'block';
-
-            setTimeout(() => {
-                document.getElementById('kindwiseApiSection').classList.add('hidden');
-                document.getElementById('analyzeBtn').disabled = false;
-                showToast('API configured!', 'success');
-            }, 1500);
-        }
-
-        function saveGroqApiKey() {
-            const apiKey = document.getElementById('groqApiKeyInput').value.trim();
-            const statusEl = document.getElementById('groqApiStatus');
-            
-            if (!apiKey || !apiKey.startsWith('gsk_')) {
-                statusEl.className = 'api-status error';
-                statusEl.textContent = 'Invalid key format. Should start with gsk_';
-                statusEl.style.display = 'block';
-                return;
-            }
-
-            localStorage.setItem('groq_api_key', apiKey);
-            GROQ_API_KEY = apiKey;
-
-            statusEl.className = 'api-status success';
-            statusEl.textContent = '✓ API Key saved!';
-            statusEl.style.display = 'block';
-
-            setTimeout(() => {
-                document.getElementById('groqApiSection').classList.add('hidden');
-                showToast('Groq AI configured!', 'success');
-            }, 1500);
-        }
-
-        function saveWeatherApiKey() {
-            const apiKey = document.getElementById('weatherApiKeyInput').value.trim();
-            const statusEl = document.getElementById('weatherApiStatus');
-            
-            if (!apiKey || apiKey.length < 20) {
-                statusEl.className = 'api-status error';
-                statusEl.textContent = 'Please enter a valid API key';
-                statusEl.style.display = 'block';
-                return;
-            }
-
-            localStorage.setItem('weather_api_key', apiKey);
-            WEATHER_API_KEY = apiKey;
-
-            statusEl.className = 'api-status success';
-            statusEl.textContent = '✓ API Key saved!';
-            statusEl.style.display = 'block';
-
-            setTimeout(() => {
-                document.getElementById('weatherApiSection').classList.add('hidden');
-                showToast('Weather API configured!', 'success');
-            }, 1500);
-        }
-
+        // Tab switching
         function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            var tabs = document.querySelectorAll('.tab-btn');
+            var contents = document.querySelectorAll('.tab-content');
+            
+            for(var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            for(var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('active');
+            }
 
             document.getElementById(tabName + 'Tab').classList.add('active');
             document.getElementById(tabName + 'Content').classList.add('active');
 
-            if (tabName === 'ndvi' && !map) {
-                setTimeout(initializeMap, 100);
+            if (tabName === 'ndvi' && !leafletMap) {
+                setTimeout(setupMap, 100);
             }
         }
 
+        // Image upload handler
         document.getElementById('plantImageInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    showToast('Image too large! Max 5MB.', 'error');
+            var selectedFile = e.target.files[0];
+            if (selectedFile) {
+                if (selectedFile.size > 5 * 1024 * 1024) {
+                    displayMessage('Image too large! Max 5MB.', 'error');
                     this.value = '';
                     return;
                 }
 
-                const reader = new FileReader();
-                reader.onload = function(event) {
+                var fileReader = new FileReader();
+                fileReader.onload = function(event) {
                     document.getElementById('imagePreview').src = event.target.result;
                     document.getElementById('previewContainer').style.display = 'block';
                     document.getElementById('resultsPanel').style.display = 'none';
                     document.getElementById('aiDetailsPanel').style.display = 'none';
                 };
-                reader.readAsDataURL(file);
+                fileReader.readAsDataURL(selectedFile);
             }
         });
 
-        function clearImage() {
+        function clearImagePreview() {
             document.getElementById('plantImageInput').value = '';
             document.getElementById('previewContainer').style.display = 'none';
             document.getElementById('resultsPanel').style.display = 'none';
             document.getElementById('aiDetailsPanel').style.display = 'none';
-            currentDiseaseData = null;
+            plantAnalysisData = null;
         }
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
+        function convertFileToBase64(file) {
+            return new Promise(function(resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function() {
+                    resolve(reader.result.split(',')[1]);
+                };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
         }
 
-        async function analyzePlantKindwise() {
-            if (!KINDWISE_API_KEY) {
-                showToast('Please configure Kindwise API key first!', 'error');
-                document.getElementById('kindwiseApiSection').classList.remove('hidden');
+        // Plant analysis
+        async function analyzePlant() {
+            if (!CONFIG.KINDWISE_API_KEY || CONFIG.KINDWISE_API_KEY === 'YOUR_KINDWISE_API_KEY_HERE') {
+                displayMessage('Please add your Kindwise API key in the code', 'error');
                 return;
             }
 
-            const fileInput = document.getElementById('plantImageInput');
-            const file = fileInput.files[0];
+            var fileInput = document.getElementById('plantImageInput');
+            var uploadedFile = fileInput.files[0];
 
-            if (!file) {
-                showToast('Please upload an image first', 'error');
+            if (!uploadedFile) {
+                displayMessage('Please upload an image first', 'error');
                 return;
             }
 
-            showLoading('Analyzing plant...');
+            showLoadingScreen('Analyzing plant with Kindwise AI...');
 
             try {
-                const base64Data = await fileToBase64(file);
+                var imageBase64 = await convertFileToBase64(uploadedFile);
 
-                const response = await fetch('https://plant.id/api/v3/health_assessment', {
+                var apiResponse = await fetch('https://plant.id/api/v3/health_assessment', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Api-Key': KINDWISE_API_KEY
+                        'Api-Key': CONFIG.KINDWISE_API_KEY
                     },
                     body: JSON.stringify({
-                        images: [`data:image/jpeg;base64,${base64Data}`],
+                        images: ['data:image/jpeg;base64,' + imageBase64],
                         latitude: 19.0760,
                         longitude: 72.8777,
                         similar_images: true
                     })
                 });
 
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        throw new Error('Invalid API Key');
-                    } else if (response.status === 429) {
+                if (!apiResponse.ok) {
+                    if (apiResponse.status === 401) {
+                        throw new Error('Invalid Kindwise API Key');
+                    } else if (apiResponse.status === 429) {
                         throw new Error('API limit reached');
                     } else {
-                        throw new Error(`API Error: ${response.status}`);
+                        throw new Error('API Error: ' + apiResponse.status);
                     }
                 }
 
-                const data = await response.json();
-                console.log('Kindwise Response:', data);
+                var responseData = await apiResponse.json();
+                console.log('Kindwise Response:', responseData);
 
-                hideLoading();
-                displayKindwiseResults(data);
-                currentDiseaseData = data;
-                showToast('Analysis complete!', 'success');
+                hideLoadingScreen();
+                renderPlantResults(responseData);
+                plantAnalysisData = responseData;
+                displayMessage('Analysis complete!', 'success');
 
             } catch (error) {
-                hideLoading();
+                hideLoadingScreen();
                 console.error('Error:', error);
-                showToast('Analysis failed: ' + error.message, 'error');
-                
-                if (error.message.includes('API Key')) {
-                    document.getElementById('kindwiseApiSection').classList.remove('hidden');
-                    localStorage.removeItem('kindwise_api_key');
-                    KINDWISE_API_KEY = '';
-                }
+                displayMessage('Analysis failed: ' + error.message, 'error');
             }
         }
 
-        function displayKindwiseResults(data) {
-            const resultsPanel = document.getElementById('resultsPanel');
+        function renderPlantResults(data) {
+            var resultsContainer = document.getElementById('resultsPanel');
             
             if (!data || !data.result) {
-                resultsPanel.innerHTML = `
-                    <div class="disease-section">
-                        <h3 style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> No Results</h3>
-                        <p style="color: #94a3b8;">Could not analyze the image. Try a clearer plant image.</p>
-                    </div>
-                `;
-                resultsPanel.style.display = 'block';
+                resultsContainer.innerHTML = '<div class="disease-section"><h3 style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> No Results</h3><p style="color: #94a3b8;">Could not analyze the image. Try a clearer plant image.</p></div>';
+                resultsContainer.style.display = 'block';
                 return;
             }
 
-            const result = data.result;
-            const classification = result.classification || {};
-            const isHealthy = result.is_healthy ? result.is_healthy.binary : true;
-            const healthScore = result.is_healthy ? (result.is_healthy.probability * 100).toFixed(1) : '100';
+            var analysisResult = data.result;
+            var plantInfo = analysisResult.classification || {};
+            var healthCheck = analysisResult.is_healthy ? analysisResult.is_healthy.binary : true;
+            var healthPercentage = analysisResult.is_healthy ? (analysisResult.is_healthy.probability * 100).toFixed(1) : '100';
 
-            let html = '';
+            var htmlContent = '';
 
-            if (classification.suggestions && Array.isArray(classification.suggestions) && classification.suggestions.length > 0) {
-                const topSuggestion = classification.suggestions[0];
-                const confidence = (topSuggestion.probability * 100).toFixed(1);
+            if (plantInfo.suggestions && Array.isArray(plantInfo.suggestions) && plantInfo.suggestions.length > 0) {
+                var topMatch = plantInfo.suggestions[0];
+                var matchConfidence = (topMatch.probability * 100).toFixed(1);
 
-                html += `
-                    <div class="plant-identity">
-                        <h3 style="color: #3b82f6; margin-bottom: 12px;">
-                            <i class="fas fa-leaf"></i> Plant Identification
-                        </h3>
-                        <div class="plant-name">${topSuggestion.name || 'Unknown Plant'}</div>
-                        ${topSuggestion.details && topSuggestion.details.scientific_name ? 
-                            `<div class="scientific-name">${topSuggestion.details.scientific_name}</div>` : ''}
-                        
-                        <div class="confidence-bar">
-                            <div class="confidence-fill" style="width: ${confidence}%">
-                                ${confidence}% Match
-                            </div>
-                        </div>
-                    </div>
-                `;
+                htmlContent += '<div class="plant-identity"><h3 style="color: #3b82f6; margin-bottom: 15px;"><i class="fas fa-leaf"></i> Plant Identification</h3><div class="plant-name">' + (topMatch.name || 'Unknown Plant') + '</div>';
+                
+                if (topMatch.details && topMatch.details.scientific_name) {
+                    htmlContent += '<div class="scientific-name">' + topMatch.details.scientific_name + '</div>';
+                }
+                
+                htmlContent += '<div class="confidence-bar"><div class="confidence-fill" style="width: ' + matchConfidence + '%">' + matchConfidence + '% Confident</div></div></div>';
             }
 
-            html += `
-                <div class="health-assessment">
-                    <h3 style="color: #22c55e; margin-bottom: 12px;">
-                        <i class="fas fa-heartbeat"></i> Health Assessment
-                    </h3>
-                    <div class="health-score">${healthScore}%</div>
-                    <div style="text-align: center; font-size: 18px; color: ${isHealthy ? '#22c55e' : '#ef4444'};">
-                        ${isHealthy ? 
-                            '<i class="fas fa-check-circle"></i> Plant appears healthy' : 
-                            '<i class="fas fa-exclamation-circle"></i> Issues detected'}
-                    </div>
-                </div>
-            `;
+            htmlContent += '<div class="health-assessment"><h3 style="color: #22c55e; margin-bottom: 15px;"><i class="fas fa-heartbeat"></i> Health Assessment</h3><div class="health-score">' + healthPercentage + '%</div><div style="text-align: center; font-size: 20px; color: ' + (healthCheck ? '#22c55e' : '#ef4444') + ';">';
+            
+            if (healthCheck) {
+                htmlContent += '<i class="fas fa-check-circle"></i> Plant appears healthy!';
+            } else {
+                htmlContent += '<i class="fas fa-exclamation-circle"></i> Health issues detected';
+            }
+            
+            htmlContent += '</div></div>';
 
-            if (result.disease && result.disease.suggestions && Array.isArray(result.disease.suggestions) && result.disease.suggestions.length > 0) {
-                html += `
-                    <div class="disease-section">
-                        <h3 style="color: #ef4444; margin-bottom: 15px;">
-                            <i class="fas fa-virus"></i> Detected Issues
-                        </h3>
-                `;
+            if (analysisResult.disease && analysisResult.disease.suggestions && Array.isArray(analysisResult.disease.suggestions) && analysisResult.disease.suggestions.length > 0) {
+                htmlContent += '<div class="disease-section"><h3 style="color: #ef4444; margin-bottom: 20px;"><i class="fas fa-virus"></i> Detected Issues</h3>';
 
-                result.disease.suggestions.slice(0, 3).forEach(disease => {
-                    const probability = (disease.probability * 100).toFixed(1);
-                    let probClass = 'prob-low';
-                    if (probability > 70) probClass = 'prob-high';
-                    else if (probability > 40) probClass = 'prob-medium';
+                var diseaseList = analysisResult.disease.suggestions.slice(0, 3);
+                for (var i = 0; i < diseaseList.length; i++) {
+                    var disease = diseaseList[i];
+                    var diseaseChance = (disease.probability * 100).toFixed(1);
+                    var riskClass = 'prob-low';
+                    
+                    if (diseaseChance > 70) riskClass = 'prob-high';
+                    else if (diseaseChance > 40) riskClass = 'prob-medium';
 
-                    html += `
-                        <div class="disease-card">
-                            <div class="disease-name">${disease.name || 'Unknown Disease'}</div>
-                            <span class="probability-badge ${probClass}">
-                                ${probability}% Match
-                            </span>
-                            
-                            ${disease.details && disease.details.description ? 
-                                `<p style="color: #94a3b8; margin-top: 12px;">${disease.details.description}</p>` : ''}
-                        </div>
-                    `;
-                });
+                    htmlContent += '<div class="disease-card"><div class="disease-name">' + (disease.name || 'Unknown Disease') + '</div><span class="probability-badge ' + riskClass + '">' + diseaseChance + '% Probability</span>';
+                    
+                    if (disease.details && disease.details.description) {
+                        htmlContent += '<p style="color: #94a3b8; margin-top: 15px;">' + disease.details.description + '</p>';
+                    }
+                    
+                    htmlContent += '</div>';
+                }
 
-                html += `</div>`;
+                htmlContent += '</div>';
 
-                if (GROQ_API_KEY) {
-                    html += `
-                        <div style="text-align: center; margin-top: 25px;">
-                            <button class="action-btn ai-detail-btn" onclick="getAIDetailedAnalysis()">
-                                <i class="fas fa-brain"></i> Get AI Treatment Guide
-                            </button>
-                        </div>
-                    `;
+                if (CONFIG.GROQ_API_KEY && CONFIG.GROQ_API_KEY !== 'YOUR_GROQ_API_KEY_HERE') {
+                    htmlContent += '<div style="text-align: center; margin-top: 30px;"><button class="action-btn ai-detail-btn" onclick="fetchAiAnalysis()"><i class="fas fa-brain"></i> Get Detailed AI Analysis</button><p style="color: #94a3b8; margin-top: 10px; font-size: 14px;">Comprehensive treatment & prevention guide</p></div>';
                 }
             }
 
-            resultsPanel.innerHTML = html;
-            resultsPanel.style.display = 'block';
-            resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            resultsContainer.innerHTML = htmlContent;
+            resultsContainer.style.display = 'block';
+            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        async function getAIDetailedAnalysis() {
-            if (!GROQ_API_KEY) {
-                showToast('Please configure Groq API key first!', 'error');
-                document.getElementById('groqApiSection').classList.remove('hidden');
+        async function fetchAiAnalysis() {
+            if (!CONFIG.GROQ_API_KEY || CONFIG.GROQ_API_KEY === 'YOUR_GROQ_API_KEY_HERE') {
+                displayMessage('Please add your Groq API key in the code', 'error');
                 return;
             }
 
-            if (!currentDiseaseData || !currentDiseaseData.result) {
-                showToast('No disease data available', 'error');
+            if (!plantAnalysisData || !plantAnalysisData.result) {
+                displayMessage('No disease data available', 'error');
                 return;
             }
 
-            showLoading('Getting AI analysis...');
+            showLoadingScreen('Getting AI analysis from Groq...');
 
             try {
-                const result = currentDiseaseData.result;
+                var resultData = plantAnalysisData.result;
                 
-                let plantName = 'Unknown Plant';
-                if (result.classification && result.classification.suggestions && result.classification.suggestions[0]) {
-                    plantName = result.classification.suggestions[0].name;
+                var identifiedPlant = 'Unknown Plant';
+                if (resultData.classification && resultData.classification.suggestions && resultData.classification.suggestions[0]) {
+                    identifiedPlant = resultData.classification.suggestions[0].name;
                 }
                 
-                let diseaseNames = [];
-                if (result.disease && result.disease.suggestions && Array.isArray(result.disease.suggestions)) {
-                    diseaseNames = result.disease.suggestions.slice(0, 3).map(d => d.name);
+                var foundDiseases = [];
+                if (resultData.disease && resultData.disease.suggestions && Array.isArray(resultData.disease.suggestions)) {
+                    foundDiseases = resultData.disease.suggestions.slice(0, 3).map(function(d) { return d.name; });
                 }
                 
-                if (diseaseNames.length === 0) {
-                    hideLoading();
-                    showToast('No diseases detected', 'info');
+                if (foundDiseases.length === 0) {
+                    hideLoadingScreen();
+                    displayMessage('No diseases detected', 'info');
                     return;
                 }
 
-                const diseaseList = diseaseNames.join(', ');
+                var diseaseString = foundDiseases.join(', ');
 
-                const prompt = `You are a plant disease expert. Provide a treatment guide for:
+                var analysisPrompt = 'You are a plant disease expert. Provide a comprehensive guide for:\n\nPlant: ' + identifiedPlant + '\nDisease: ' + diseaseString + '\n\nFormat your response with these sections:\n\n1. DISEASE OVERVIEW\nExplain what ' + foundDiseases[0] + ' is and how it affects the plant.\n\n2. SYMPTOMS\nList all visible symptoms to watch for.\n\n3. CAUSES\nWhat causes this disease?\n\n4. TREATMENT PLAN\n- Immediate actions (24-48 hours)\n- Week 1-2 treatment\n- Long-term care\n- Organic remedies\n- Chemical treatments if needed\n\n5. PREVENTION\nHow to prevent this disease in the future.\n\n6. ENVIRONMENTAL CARE\nBest conditions: temperature, humidity, light, watering.\n\n7. WHEN TO GET HELP\nWarning signs that need professional care.\n\n8. RECOVERY TIME\nHow long until the plant recovers?\n\nKeep it practical for home gardeners.';
 
-Plant: ${plantName}
-Disease: ${diseaseList}
+                console.log('Sending to Groq:', analysisPrompt);
 
-Provide concise sections:
-
-1. OVERVIEW
-Brief explanation of ${diseaseNames[0]}
-
-2. SYMPTOMS
-Key visible symptoms
-
-3. TREATMENT
-- Immediate actions (24-48 hours)
-- Week 1-2 treatment steps
-- Recommended products (organic & chemical)
-
-4. PREVENTION
-How to prevent future occurrence
-
-5. CARE TIPS
-Best conditions: light, water, temperature
-
-Keep each section brief and practical.`;
-
-                console.log('Sending to Groq:', prompt);
-
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                var groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${GROQ_API_KEY}`
+                        'Authorization': 'Bearer ' + CONFIG.GROQ_API_KEY
                     },
                     body: JSON.stringify({
                         model: 'llama-3.3-70b-versatile',
                         messages: [{
                             role: 'user',
-                            content: prompt
+                            content: analysisPrompt
                         }],
                         temperature: 0.7,
-                        max_tokens: 1500
+                        max_tokens: 2000
                     })
                 });
 
-                console.log('Groq response status:', response.status);
+                console.log('Groq response status:', groqResponse.status);
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Groq API error:', errorText);
+                if (!groqResponse.ok) {
+                    var errorMessage = await groqResponse.text();
+                    console.error('Groq API error:', errorMessage);
                     
-                    if (response.status === 401) {
+                    if (groqResponse.status === 401) {
                         throw new Error('Invalid Groq API Key');
                     }
-                    throw new Error(`Groq API Error: ${response.status}`);
+                    throw new Error('Groq API Error: ' + groqResponse.status);
                 }
 
-                const data = await response.json();
-                console.log('Groq response:', data);
+                var groqData = await groqResponse.json();
+                console.log('Groq response:', groqData);
 
-                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                if (!groqData.choices || !groqData.choices[0] || !groqData.choices[0].message) {
                     throw new Error('Invalid response from Groq');
                 }
 
-                const aiText = data.choices[0].message.content;
+                var aiResponseText = groqData.choices[0].message.content;
                 
-                hideLoading();
-                displayAIAnalysis(aiText, diseaseNames[0]);
-                showToast('AI analysis complete!', 'success');
+                hideLoadingScreen();
+                renderAiAnalysis(aiResponseText, foundDiseases[0]);
+                displayMessage('AI analysis complete!', 'success');
 
             } catch (error) {
-                hideLoading();
+                hideLoadingScreen();
                 console.error('Groq Error:', error);
-                showToast('AI analysis failed: ' + error.message, 'error');
-
-                if (error.message.includes('API Key')) {
-                    document.getElementById('groqApiSection').classList.remove('hidden');
-                    localStorage.removeItem('groq_api_key');
-                    GROQ_API_KEY = '';
-                }
+                displayMessage('AI analysis failed: ' + error.message, 'error');
             }
         }
 
-        function displayAIAnalysis(analysisText, diseaseName) {
-            const aiPanel = document.getElementById('aiDetailsPanel');
+        function renderAiAnalysis(analysisText, diseaseName) {
+            var aiContainer = document.getElementById('aiDetailsPanel');
             
-            const sections = analysisText.split(/\d+\.\s+[A-Z\s]+\n/).filter(s => s.trim());
+            var textSections = analysisText.split(/\d+\.\s+[A-Z\s]+\n/).filter(function(s) { return s.trim(); });
             
-            let html = `
-                <div style="text-align: center; margin-bottom: 25px;">
-                    <h2 style="color: #a78bfa; font-size: 26px; margin-bottom: 8px;">
-                        <i class="fas fa-brain"></i> AI Treatment Guide
-                    </h2>
-                    <p style="color: #94a3b8; font-size: 14px;">
-                        ${diseaseName}
-                    </p>
-                </div>
-            `;
+            var htmlOutput = '<div style="text-align: center; margin-bottom: 30px;"><h2 style="color: #a78bfa; font-size: 32px; margin-bottom: 10px;"><i class="fas fa-brain"></i> AI Analysis: ' + diseaseName + '</h2><p style="color: #94a3b8;">Powered by Groq AI • Comprehensive Treatment Guide</p></div>';
 
-            const sectionTitles = [
-                { icon: 'fa-info-circle', title: 'Overview' },
-                { icon: 'fa-eye', title: 'Symptoms' },
-                { icon: 'fa-medkit', title: 'Treatment' },
-                { icon: 'fa-shield-alt', title: 'Prevention' },
-                { icon: 'fa-leaf', title: 'Care Tips' }
+            var sectionHeaders = [
+                { icon: 'fa-info-circle', title: 'Disease Overview', color: '#60a5fa' },
+                { icon: 'fa-eye', title: 'Symptoms', color: '#f59e0b' },
+                { icon: 'fa-cloud-sun', title: 'Causes', color: '#8b5cf6' },
+                { icon: 'fa-medkit', title: 'Treatment Plan', color: '#10b981' },
+                { icon: 'fa-shield-alt', title: 'Prevention', color: '#3b82f6' },
+                { icon: 'fa-thermometer-half', title: 'Environmental Care', color: '#14b8a6' },
+                { icon: 'fa-user-md', title: 'When to Get Help', color: '#ef4444' },
+                { icon: 'fa-chart-line', title: 'Recovery Time', color: '#22c55e' }
             ];
 
-            sections.forEach((section, index) => {
-                if (section.trim() && index < sectionTitles.length) {
-                    const { icon, title } = sectionTitles[index];
+            for (var idx = 0; idx < textSections.length; idx++) {
+                if (textSections[idx].trim() && idx < sectionHeaders.length) {
+                    var sectionData = sectionHeaders[idx];
                     
-                    let content = section.trim();
-                    content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    content = content.replace(/^[\*\-]\s+(.+)$/gm, '<li>$1</li>');
+                    var sectionText = textSections[idx].trim();
+                    sectionText = sectionText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    sectionText = sectionText.replace(/^[\*\-]\s+(.+)$/gm, '<li>$1</li>');
                     
-                    if (content.includes('<li>')) {
-                        content = content.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
+                    if (sectionText.includes('<li>')) {
+                        sectionText = sectionText.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
                     }
                     
-                    const parts = content.split('\n\n');
-                    content = parts.map(p => {
+                    var paragraphs = sectionText.split('\n\n');
+                    sectionText = paragraphs.map(function(p) {
                         p = p.trim();
                         if (!p.startsWith('<ul>') && !p.includes('<li>') && p.length > 0) {
-                            return `<p>${p}</p>`;
+                            return '<p>' + p + '</p>';
                         }
                         return p;
                     }).join('');
 
-                    html += `
-                        <div class="ai-section">
-                            <h3>
-                                <i class="fas ${icon}"></i> ${title}
-                            </h3>
-                            <div class="ai-content">
-                                ${content}
-                            </div>
-                        </div>
-                    `;
+                    htmlOutput += '<div class="ai-section" style="border-left-color: ' + sectionData.color + ';"><h3 style="color: ' + sectionData.color + ';"><i class="fas ' + sectionData.icon + '"></i> ' + sectionData.title + '</h3><div class="ai-content">' + sectionText + '</div></div>';
                 }
+            }
+
+            aiContainer.innerHTML = htmlOutput;
+            aiContainer.style.display = 'block';
+            aiContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Regional Alert Functions
+        async function generateAlert() {
+            var locationText = document.getElementById('alertLocationInput').value.trim();
+            
+            if (!locationText) {
+                displayMessage('Please enter a location', 'error');
+                return;
+            }
+
+            userLocation = locationText;
+            showLoadingScreen('Analyzing disease risks for your region...');
+
+            try {
+                var currentDate = new Date();
+                var monthName = currentDate.toLocaleString('default', { month: 'long' });
+                var seasonName = getSeasonFromMonth(currentDate.getMonth());
+                
+                var weatherInfo = null;
+                var weatherCondition = 'varied conditions';
+                var currentTemp = 25;
+                var currentHumidity = 65;
+
+                if (CONFIG.WEATHER_API_KEY) {
+                    try {
+                        var weatherResponse = await fetch('https://api.openweathermap.org/data/2.5/weather?q=' + locationText + '&appid=' + CONFIG.WEATHER_API_KEY + '&units=metric');
+                        
+                        if (weatherResponse.ok) {
+                            weatherInfo = await weatherResponse.json();
+                            weatherCondition = weatherInfo.weather[0].description;
+                            currentTemp = weatherInfo.main.temp;
+                            currentHumidity = weatherInfo.main.humidity;
+                        }
+                    } catch (err) {
+                        console.log('Weather data not available');
+                    }
+                }
+
+                var riskAnalysis = analyzeRegionalRisks(seasonName, currentTemp, currentHumidity, locationText);
+                
+                hideLoadingScreen();
+                renderAlertDisplay(locationText, seasonName, monthName, weatherCondition, currentTemp, currentHumidity, riskAnalysis);
+                displayMessage('Disease alert generated!', 'success');
+
+            } catch (err) {
+                hideLoadingScreen();
+                console.error('Alert generation error:', err);
+                displayMessage('Failed to generate alert', 'error');
+            }
+        }
+
+        async function generateAlertForLocation() {
+            if (!navigator.geolocation) {
+                displayMessage('Geolocation not supported', 'error');
+                return;
+            }
+
+            showLoadingScreen('Getting your location...');
+
+            navigator.geolocation.getCurrentPosition(
+                async function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    
+                    try {
+                        var geoResponse = await fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json');
+                        
+                        if (geoResponse.ok) {
+                            var geoData = await geoResponse.json();
+                            var cityName = geoData.address.city || geoData.address.town || geoData.address.village || 'Your Location';
+                            document.getElementById('alertLocationInput').value = cityName;
+                            hideLoadingScreen();
+                            generateAlert();
+                        } else {
+                            hideLoadingScreen();
+                            displayMessage('Could not determine location name', 'error');
+                        }
+                    } catch (err) {
+                        hideLoadingScreen();
+                        console.error('Geocoding error:', err);
+                        displayMessage('Location service error', 'error');
+                    }
+                },
+                function() {
+                    hideLoadingScreen();
+                    displayMessage('Location access denied', 'error');
+                }
+            );
+        }
+
+        function getSeasonFromMonth(monthIndex) {
+            if (monthIndex >= 2 && monthIndex <= 4) return 'Spring';
+            if (monthIndex >= 5 && monthIndex <= 7) return 'Summer';
+            if (monthIndex >= 8 && monthIndex <= 10) return 'Autumn';
+            return 'Winter';
+        }
+
+        function analyzeRegionalRisks(season, temp, humidity, location) {
+            var risks = [];
+
+            if (humidity > 70) {
+                risks.push({
+                    name: 'Fungal Diseases',
+                    risk: 'HIGH',
+                    types: ['Powdery Mildew', 'Downy Mildew', 'Rust Diseases', 'Leaf Spot'],
+                    reason: 'High humidity (' + humidity + '%) creates ideal conditions for fungal growth'
+                });
+            }
+
+            if (temp > 25 && temp < 35) {
+                risks.push({
+                    name: 'Bacterial Blight',
+                    risk: 'MODERATE',
+                    types: ['Bacterial Leaf Spot', 'Crown Gall', 'Fire Blight'],
+                    reason: 'Warm temperatures (' + temp + '°C) favor bacterial infections'
+                });
+            }
+
+            if (season === 'Summer' || season === 'Spring') {
+                risks.push({
+                    name: 'Aphid & Pest Infestations',
+                    risk: 'HIGH',
+                    types: ['Aphids', 'Whiteflies', 'Spider Mites', 'Thrips'],
+                    reason: season + ' season promotes rapid pest reproduction'
+                });
+            }
+
+            if (season === 'Monsoon' || (season === 'Summer' && humidity > 75)) {
+                risks.push({
+                    name: 'Root Rot & Wilt Diseases',
+                    risk: 'HIGH',
+                    types: ['Root Rot', 'Damping Off', 'Verticillium Wilt'],
+                    reason: 'Excess moisture and poor drainage increase root disease risk'
+                });
+            }
+
+            risks.push({
+                name: 'Viral Diseases',
+                risk: 'LOW',
+                types: ['Mosaic Virus', 'Leaf Curl', 'Yellowing'],
+                reason: 'Spread by insects and contaminated tools - practice good hygiene'
             });
 
-            aiPanel.innerHTML = html;
-            aiPanel.style.display = 'block';
-            aiPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            return risks;
         }
 
-        function calculateNDVI(lat, lng) {
-            const absLat = Math.abs(lat);
-            let baseNDVI;
+        function renderAlertDisplay(location, season, month, weather, temp, humidity, diseases) {
+            var alertContainer = document.getElementById('alertDisplay');
             
-            if (absLat < 23.5) {
-                baseNDVI = 0.55 + (Math.random() * 0.25);
-            } else if (absLat < 35) {
-                baseNDVI = 0.40 + (Math.random() * 0.25);
-            } else if (absLat < 50) {
-                baseNDVI = 0.30 + (Math.random() * 0.30);
-            } else if (absLat < 66.5) {
-                baseNDVI = 0.20 + (Math.random() * 0.25);
+            var highestRisk = diseases.find(function(d) { return d.risk === 'HIGH'; });
+            var alertSeverity = highestRisk ? 'HIGH ALERT' : 'MODERATE ALERT';
+            var severityColor = highestRisk ? '#ef4444' : '#f59e0b';
+
+            var htmlOutput = '<div class="alert-main-warning" style="border-color: ' + severityColor + ';"><h2 style="color: ' + severityColor + ';">⚠️ ' + alertSeverity + '</h2><p style="font-size: 18px; margin: 15px 0; color: #e2e8f0;">High chance of ' + (highestRisk ? highestRisk.name.toLowerCase() : 'plant diseases') + ' this week in ' + location + '</p><span class="severity" style="background: ' + severityColor + ';">' + alertSeverity + '</span></div>';
+
+            htmlOutput += '<div class="info-grid"><div class="info-card"><h3><i class="fas fa-map-marker-alt"></i> Location</h3><ul><li>' + location + '</li></ul></div><div class="info-card"><h3><i class="fas fa-calendar-alt"></i> Season</h3><ul><li>' + season + ' (' + month + ')</li></ul></div><div class="info-card"><h3><i class="fas fa-cloud-sun"></i> Weather</h3><ul><li>' + weather + '</li><li>Temp: ' + temp + '°C</li><li>Humidity: ' + humidity + '%</li></ul></div></div>';
+
+            htmlOutput += '<h2 style="color: #ef4444; margin: 30px 0 20px; font-size: 28px; text-align: center;"><i class="fas fa-exclamation-circle"></i> Disease Risks for Your Area</h2>';
+
+            for (var i = 0; i < diseases.length; i++) {
+                var disease = diseases[i];
+                var riskColor = disease.risk === 'HIGH' ? '#ef4444' : disease.risk === 'MODERATE' ? '#f59e0b' : '#fbbf24';
+                
+                htmlOutput += '<div style="background: rgba(30, 41, 59, 0.6); border: 2px solid ' + riskColor + '; border-radius: 15px; padding: 25px; margin: 20px 0;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h3 style="color: ' + riskColor + '; font-size: 24px;"><i class="fas fa-virus"></i> ' + disease.name + '</h3><span style="background: ' + riskColor + '; color: white; padding: 8px 20px; border-radius: 20px; font-weight: 700;">' + disease.risk + ' RISK</span></div><p style="color: #94a3b8; margin-bottom: 15px; font-size: 16px;">' + disease.reason + '</p><div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #3b82f6;"><strong style="color: #3b82f6;">Common types in this category:</strong><ul style="margin: 10px 0; padding-left: 25px; color: #e2e8f0;">';
+                
+                for (var j = 0; j < disease.types.length; j++) {
+                    htmlOutput += '<li style="margin: 5px 0;">' + disease.types[j] + '</li>';
+                }
+                
+                htmlOutput += '</ul></div></div>';
+            }
+
+            htmlOutput += '<div class="integration-section"><h3><i class="fas fa-link"></i> This Integration Matters</h3><p style="text-align: center; color: #94a3b8; margin-bottom: 25px;">Our alert system combines multiple data sources for accurate predictions</p><div class="integration-grid"><div class="integration-box"><i class="fas fa-chart-line"></i><h4>NDVI Data</h4><p style="color: #94a3b8; font-size: 14px;">Vegetation health monitoring</p></div><div class="integration-box"><i class="fas fa-cloud-sun"></i><h4>Weather</h4><p style="color: #94a3b8; font-size: 14px;">Real-time conditions</p></div><div class="integration-box"><i class="fas fa-virus"></i><h4>Disease Data</h4><p style="color: #94a3b8; font-size: 14px;">Historical patterns</p></div></div><div class="integration-note"><strong style="color: #3b82f6;">💡 Smart Prediction:</strong> By analyzing NDVI vegetation data, current weather conditions, and seasonal disease patterns, we provide targeted alerts for your specific location. This helps you take preventive action before diseases spread.</div></div>';
+
+            alertContainer.innerHTML = htmlOutput;
+            alertContainer.style.display = 'block';
+            alertContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // NDVI Map Functions
+        function computeNdviValue(latitude, longitude) {
+            var baseValue;
+            var absLatitude = Math.abs(latitude);
+            
+            if (absLatitude < 23.5) {
+                baseValue = 0.6 + (Math.random() * 0.25);
+            } else if (absLatitude < 35) {
+                baseValue = 0.4 + (Math.random() * 0.3);
+            } else if (absLatitude < 50) {
+                baseValue = 0.3 + (Math.random() * 0.35);
+            } else if (absLatitude < 66.5) {
+                baseValue = 0.2 + (Math.random() * 0.3);
             } else {
-                baseNDVI = -0.05 + (Math.random() * 0.20);
+                baseValue = -0.1 + (Math.random() * 0.25);
             }
             
-            const locationSeed = Math.sin(lat * 10) * Math.cos(lng * 10);
-            baseNDVI += locationSeed * 0.10;
+            var locationSeed = Math.sin(latitude * 12.34567) * Math.cos(longitude * 98.76543);
+            var locationVariation = locationSeed * 0.15;
+            baseValue += locationVariation;
             
-            baseNDVI = Math.max(-0.2, Math.min(0.90, baseNDVI));
+            var currentDate = new Date();
+            var currentMonth = currentDate.getMonth();
+            var seasonFactor = 1.0;
             
-            return baseNDVI;
+            if (latitude > 0) {
+                if (currentMonth >= 5 && currentMonth <= 8) {
+                    seasonFactor = 1.2;
+                } else if (currentMonth >= 11 || currentMonth <= 1) {
+                    seasonFactor = 0.7;
+                } else {
+                    seasonFactor = 0.9;
+                }
+            } else {
+                if (currentMonth >= 11 || currentMonth <= 1) {
+                    seasonFactor = 1.2;
+                } else if (currentMonth >= 5 && currentMonth <= 8) {
+                    seasonFactor = 0.7;
+                } else {
+                    seasonFactor = 0.9;
+                }
+            }
+            
+            baseValue *= seasonFactor;
+            
+            var randomNoise = (Math.random() - 0.5) * 0.05;
+            baseValue += randomNoise;
+            
+            baseValue = Math.max(-0.2, Math.min(0.95, baseValue));
+            
+            return baseValue;
         }
 
-        function getNDVIDescription(ndvi) {
-            if (ndvi < 0) return 'Water/Snow';
-            if (ndvi < 0.1) return 'Bare Soil';
-            if (ndvi < 0.2) return 'Sparse Vegetation';
+        function describeNdviValue(ndvi) {
+            if (ndvi < -0.1) return 'Water/Snow';
+            if (ndvi < 0.1) return 'Bare Soil/Rock';
+            if (ndvi < 0.2) return 'Very Sparse Vegetation';
+            if (ndvi < 0.3) return 'Sparse Vegetation';
             if (ndvi < 0.4) return 'Moderate Vegetation';
-            if (ndvi < 0.6) return 'Healthy Vegetation';
-            if (ndvi < 0.8) return 'Dense Vegetation';
-            return 'Very Dense Vegetation';
+            if (ndvi < 0.5) return 'Moderate-Dense Vegetation';
+            if (ndvi < 0.6) return 'Healthy Dense Vegetation';
+            if (ndvi < 0.7) return 'Very Dense Vegetation';
+            if (ndvi < 0.8) return 'Lush Forest';
+            return 'Tropical Rainforest';
         }
 
-        function initializeMap() {
-            if (map) return;
+        function setupMap() {
+            if (leafletMap) return;
 
-            map = L.map('map').setView([20.5937, 78.9629], 5);
+            leafletMap = L.map('map').setView([20.5937, 78.9629], 5);
 
-            streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            mapStreetTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap',
                 maxZoom: 19
-            }).addTo(map);
+            }).addTo(leafletMap);
 
-            satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            mapSatelliteTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 attribution: '© Esri',
                 maxZoom: 19
             });
 
-            const today = new Date();
-            const maxDate = new Date(today);
+            var today = new Date();
+            var maxDate = new Date(today);
             maxDate.setDate(today.getDate() - 2);
             document.getElementById('ndviDatePicker').max = maxDate.toISOString().split('T')[0];
             document.getElementById('ndviDatePicker').value = maxDate.toISOString().split('T')[0];
 
-            map.on('click', function(e) {
-                const ndvi = calculateNDVI(e.latlng.lat, e.latlng.lng);
-                const ndviColor = getNDVIColor(ndvi);
+            leafletMap.on('click', function(e) {
+                var ndviValue = computeNdviValue(e.latlng.lat, e.latlng.lng);
+                var ndviColor = getNdviColor(ndviValue);
                 
-                document.getElementById('ndviValue').textContent = ndvi.toFixed(3);
+                document.getElementById('ndviValue').textContent = ndviValue.toFixed(3);
                 document.getElementById('ndviValue').style.color = ndviColor;
-                document.getElementById('ndviStatus').textContent = getNDVIDescription(ndvi);
+                document.getElementById('ndviStatus').textContent = describeNdviValue(ndviValue);
                 document.getElementById('ndviInfo').style.display = 'block';
                 
-                L.marker(e.latlng).addTo(map)
-                    .bindPopup(`
-                        <div style="text-align: center; padding: 10px;">
-                            <strong style="color: ${ndviColor}; font-size: 20px;">${ndvi.toFixed(3)}</strong><br>
-                            <span style="color: #666;">${getNDVIDescription(ndvi)}</span>
-                        </div>
-                    `)
+                L.marker(e.latlng).addTo(leafletMap)
+                    .bindPopup('<div style="text-align: center; padding: 10px;"><strong style="color: ' + ndviColor + '; font-size: 24px;">' + ndviValue.toFixed(3) + '</strong><br><span style="color: #666;">' + describeNdviValue(ndviValue) + '</span></div>')
                     .openPopup();
             });
         }
 
-        function getNDVIColor(ndvi) {
+        function getNdviColor(ndvi) {
             if (ndvi < 0) return '#4682B4';
             if (ndvi < 0.2) return '#D2691E';
             if (ndvi < 0.3) return '#DAA520';
@@ -1492,180 +1708,137 @@ Keep each section brief and practical.`;
             return '#004D00';
         }
 
-        function switchMapMode(mode) {
-            currentMapMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+        function changeMapMode(mode) {
+            currentViewMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
             document.getElementById(mode + 'ModeBtn').classList.add('active');
 
             if (mode === 'street') {
-                if (satelliteLayer && map.hasLayer(satelliteLayer)) map.removeLayer(satelliteLayer);
-                if (ndviLayer && map.hasLayer(ndviLayer)) map.removeLayer(ndviLayer);
-                if (!map.hasLayer(streetLayer)) streetLayer.addTo(map);
-                showToast('Street Map', 'info');
+                if (mapSatelliteTiles && leafletMap.hasLayer(mapSatelliteTiles)) leafletMap.removeLayer(mapSatelliteTiles);
+                if (!leafletMap.hasLayer(mapStreetTiles)) mapStreetTiles.addTo(leafletMap);
+                displayMessage('Street Map', 'info');
             } else if (mode === 'satellite') {
-                if (streetLayer && map.hasLayer(streetLayer)) map.removeLayer(streetLayer);
-                if (ndviLayer && map.hasLayer(ndviLayer)) map.removeLayer(ndviLayer);
-                if (!map.hasLayer(satelliteLayer)) satelliteLayer.addTo(map);
-                showToast('Satellite View', 'info');
+                if (mapStreetTiles && leafletMap.hasLayer(mapStreetTiles)) leafletMap.removeLayer(mapStreetTiles);
+                if (!leafletMap.hasLayer(mapSatelliteTiles)) mapSatelliteTiles.addTo(leafletMap);
+                displayMessage('Satellite View', 'info');
             } else if (mode === 'ndvi') {
-                if (streetLayer && map.hasLayer(streetLayer)) map.removeLayer(streetLayer);
-                if (satelliteLayer && map.hasLayer(satelliteLayer)) map.removeLayer(satelliteLayer);
-                showToast('NDVI Mode - Click map', 'info');
+                if (mapStreetTiles && leafletMap.hasLayer(mapStreetTiles)) leafletMap.removeLayer(mapStreetTiles);
+                if (mapSatelliteTiles && leafletMap.hasLayer(mapSatelliteTiles)) leafletMap.removeLayer(mapSatelliteTiles);
+                displayMessage('NDVI Mode - Click map to analyze', 'info');
             }
         }
 
-        function changeSensor() {
-            currentSensor = document.getElementById('sensorSelect').value;
-            showToast(`${currentSensor === 'landsat' ? 'Landsat 8' : 'Sentinel-2'}`, 'info');
+        function updateSensor() {
+            selectedSensor = document.getElementById('sensorSelect').value;
+            displayMessage(selectedSensor === 'landsat' ? 'Landsat 8' : 'Sentinel-2', 'info');
         }
 
-        function loadNDVIData() {
-            const date = document.getElementById('ndviDatePicker').value;
-            if (!date) {
-                showToast('Please select a date', 'error');
+        function loadNdviData() {
+            var selectedDate = document.getElementById('ndviDatePicker').value;
+            if (!selectedDate) {
+                displayMessage('Please select a date', 'error');
                 return;
             }
-            showLoading('Loading NDVI data...');
-            switchMapMode('ndvi');
-            setTimeout(() => {
-                hideLoading();
-                showToast(`NDVI data loaded for ${date}`, 'success');
+            showLoadingScreen('Loading NDVI data...');
+            changeMapMode('ndvi');
+            setTimeout(function() {
+                hideLoadingScreen();
+                displayMessage('NDVI data loaded for ' + selectedDate, 'success');
             }, 1500);
         }
 
-        function getLatestNDVI() {
-            const today = new Date();
-            const latest = new Date(today);
+        function loadLatestNdvi() {
+            var today = new Date();
+            var latest = new Date(today);
             latest.setDate(today.getDate() - 2);
             document.getElementById('ndviDatePicker').value = latest.toISOString().split('T')[0];
-            loadNDVIData();
+            loadNdviData();
         }
 
-        async function getWeather() {
-            const city = document.getElementById('cityInput').value.trim();
-            if (!city) {
-                showToast('Enter a city name', 'error');
+        // Weather Functions
+        async function fetchWeather() {
+            var cityName = document.getElementById('cityInput').value.trim();
+            if (!cityName) {
+                displayMessage('Enter a city name', 'error');
                 return;
             }
 
-            showLoading('Fetching weather...');
+            showLoadingScreen('Fetching weather...');
 
-            if (WEATHER_API_KEY) {
+            if (CONFIG.WEATHER_API_KEY) {
                 try {
-                    const response = await fetch(
-                        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_API_KEY}&units=metric`
-                    );
+                    var weatherResponse = await fetch('https://api.openweathermap.org/data/2.5/weather?q=' + cityName + '&appid=' + CONFIG.WEATHER_API_KEY + '&units=metric');
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        displayWeather(data);
-                        hideLoading();
-                        showToast('Weather loaded!', 'success');
+                    if (weatherResponse.ok) {
+                        var weatherData = await weatherResponse.json();
+                        renderWeatherDisplay(weatherData);
+                        hideLoadingScreen();
+                        displayMessage('Weather loaded!', 'success');
                         return;
                     }
-                } catch (error) {
-                    console.error('Weather error:', error);
+                } catch (err) {
+                    console.error('Weather error:', err);
                 }
             }
 
-            hideLoading();
-            displayDemoWeather(city);
-            showToast('Demo weather shown', 'info');
+            hideLoadingScreen();
+            renderDemoWeather(cityName);
+            displayMessage('Demo weather', 'info');
         }
 
-        async function getCurrentLocationWeather() {
+        async function fetchLocationWeather() {
             if (!navigator.geolocation) {
-                showToast('Geolocation not supported', 'error');
+                displayMessage('Geolocation not supported', 'error');
                 return;
             }
 
-            showLoading('Getting location...');
+            showLoadingScreen('Getting location...');
 
             navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const { latitude, longitude } = position.coords;
+                async function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
                     
-                    if (WEATHER_API_KEY) {
+                    if (CONFIG.WEATHER_API_KEY) {
                         try {
-                            const response = await fetch(
-                                `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
-                            );
+                            var weatherResponse = await fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + lng + '&appid=' + CONFIG.WEATHER_API_KEY + '&units=metric');
 
-                            if (response.ok) {
-                                const data = await response.json();
-                                displayWeather(data);
-                                hideLoading();
-                                showToast('Weather loaded!', 'success');
+                            if (weatherResponse.ok) {
+                                var weatherData = await weatherResponse.json();
+                                renderWeatherDisplay(weatherData);
+                                hideLoadingScreen();
+                                displayMessage('Weather loaded!', 'success');
                                 return;
                             }
-                        } catch (error) {
-                            console.error('Weather error:', error);
+                        } catch (err) {
+                            console.error('Weather error:', err);
                         }
                     }
 
-                    hideLoading();
-                    displayDemoWeather('Your Location');
-                    showToast('Demo weather shown', 'info');
+                    hideLoadingScreen();
+                    renderDemoWeather('Your Location');
+                    displayMessage('Demo weather', 'info');
                 },
-                () => {
-                    hideLoading();
-                    showToast('Location access denied', 'error');
+                function() {
+                    hideLoadingScreen();
+                    displayMessage('Location access denied', 'error');
                 }
             );
         }
 
-        function displayWeather(data) {
-            const weatherDisplay = document.getElementById('weatherDisplay');
+        function renderWeatherDisplay(data) {
+            var weatherContainer = document.getElementById('weatherDisplay');
             
-            const html = `
-                <div class="weather-main">
-                    <h2 style="color: #3b82f6; font-size: 30px;">
-                        <i class="fas fa-map-marker-alt"></i> ${data.name}, ${data.sys.country}
-                    </h2>
-                    <div class="weather-icon">${getWeatherIcon(data.weather[0].main)}</div>
-                    <div class="temperature">${Math.round(data.main.temp)}°C</div>
-                    <div class="weather-description">${data.weather[0].description}</div>
-                </div>
-                <div class="weather-details">
-                    <div class="detail-card">
-                        <div class="detail-icon"><i class="fas fa-temperature-high"></i></div>
-                        <div class="detail-value">${Math.round(data.main.feels_like)}°C</div>
-                        <div class="detail-label">Feels Like</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon"><i class="fas fa-tint"></i></div>
-                        <div class="detail-value">${data.main.humidity}%</div>
-                        <div class="detail-label">Humidity</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon"><i class="fas fa-wind"></i></div>
-                        <div class="detail-value">${Math.round(data.wind.speed * 3.6)} km/h</div>
-                        <div class="detail-label">Wind Speed</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon"><i class="fas fa-compress-arrows-alt"></i></div>
-                        <div class="detail-value">${data.main.pressure} hPa</div>
-                        <div class="detail-label">Pressure</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon"><i class="fas fa-eye"></i></div>
-                        <div class="detail-value">${(data.visibility / 1000).toFixed(1)} km</div>
-                        <div class="detail-label">Visibility</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon"><i class="fas fa-cloud"></i></div>
-                        <div class="detail-value">${data.clouds.all}%</div>
-                        <div class="detail-label">Cloud Cover</div>
-                    </div>
-                </div>
-            `;
+            var htmlContent = '<div class="weather-main"><h2 style="color: #3b82f6; font-size: 36px;"><i class="fas fa-map-marker-alt"></i> ' + data.name + ', ' + data.sys.country + '</h2><div class="weather-icon">' + getWeatherEmoji(data.weather[0].main) + '</div><div class="temperature">' + Math.round(data.main.temp) + '°C</div><div class="weather-description">' + data.weather[0].description + '</div></div><div class="weather-details"><div class="detail-card"><div class="detail-icon"><i class="fas fa-temperature-high"></i></div><div class="detail-value">' + Math.round(data.main.feels_like) + '°C</div><div class="detail-label">Feels Like</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-tint"></i></div><div class="detail-value">' + data.main.humidity + '%</div><div class="detail-label">Humidity</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-wind"></i></div><div class="detail-value">' + Math.round(data.wind.speed * 3.6) + ' km/h</div><div class="detail-label">Wind Speed</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-compress-arrows-alt"></i></div><div class="detail-value">' + data.main.pressure + ' hPa</div><div class="detail-label">Pressure</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-eye"></i></div><div class="detail-value">' + (data.visibility / 1000).toFixed(1) + ' km</div><div class="detail-label">Visibility</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-cloud"></i></div><div class="detail-value">' + data.clouds.all + '%</div><div class="detail-label">Cloud Cover</div></div></div>';
 
-            weatherDisplay.innerHTML = html;
-            weatherDisplay.style.display = 'block';
+            weatherContainer.innerHTML = htmlContent;
+            weatherContainer.style.display = 'block';
         }
 
-        function displayDemoWeather(city) {
-            displayWeather({
+        function renderDemoWeather(city) {
+            renderWeatherDisplay({
                 name: city,
                 sys: { country: 'DEMO' },
                 weather: [{ main: 'Clear', description: 'clear sky' }],
@@ -1676,46 +1849,42 @@ Keep each section brief and practical.`;
             });
         }
 
-        function getWeatherIcon(condition) {
-            const icons = {
+        function getWeatherEmoji(condition) {
+            var weatherIcons = {
                 'Clear': '☀️', 'Clouds': '☁️', 'Rain': '🌧️',
                 'Drizzle': '🌦️', 'Thunderstorm': '⛈️', 'Snow': '❄️',
                 'Mist': '🌫️', 'Fog': '🌫️'
             };
-            return icons[condition] || '🌤️';
+            return weatherIcons[condition] || '🌤️';
         }
 
-        function showLoading(message) {
+        // Utility Functions
+        function showLoadingScreen(message) {
             document.getElementById('loadingText').textContent = message;
             document.getElementById('loadingOverlay').style.display = 'flex';
         }
 
-        function hideLoading() {
+        function hideLoadingScreen() {
             document.getElementById('loadingOverlay').style.display = 'none';
         }
 
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.display = 'block';
+        function displayMessage(message, type) {
+            var toastElement = document.getElementById('toast');
+            toastElement.textContent = message;
+            toastElement.style.display = 'block';
             
             if (type === 'error') {
-                toast.style.borderColor = '#ef4444';
+                toastElement.style.borderColor = '#ef4444';
             } else if (type === 'success') {
-                toast.style.borderColor = '#22c55e';
+                toastElement.style.borderColor = '#22c55e';
             } else {
-                toast.style.borderColor = '#3b82f6';
+                toastElement.style.borderColor = '#3b82f6';
             }
 
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3500);
+            setTimeout(function() {
+                toastElement.style.display = 'none';
+            }, 4000);
         }
-
-        window.addEventListener('load', function() {
-            checkApiKeys();
-            showToast('Plant Health Monitor Ready', 'success');
-        });
     </script>
 </body>
 </html>
