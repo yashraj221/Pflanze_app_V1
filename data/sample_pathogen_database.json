@@ -1,0 +1,113 @@
+{
+  "generated_at": "2026-02-22T00:00:00Z",
+  "source": "NCBI Nucleotide via Biopython Entrez API (sample/pre-filled data)",
+  "note": "This file contains pre-filled mock results. Run notebooks/pathogen_analysis.py to regenerate with live NCBI data.",
+  "total_pathogens": 4,
+  "pathogens": [
+    {
+      "name": "Tobacco Mosaic Virus",
+      "accession": "NC_001497",
+      "description": "A (+)ssRNA plant virus that causes mosaic discoloration and stunted growth. One of the most widely studied plant viruses.",
+      "organism": "Tobacco mosaic virus",
+      "taxonomy": [
+        "Viruses",
+        "Riboviria",
+        "Orthornavirae",
+        "Kitrinoviricota",
+        "Alsuviricetes",
+        "Martellivirales",
+        "Virgaviridae",
+        "Tobamovirus"
+      ],
+      "sequence_length_bp": 6395,
+      "gc_content_percent": 44.13,
+      "associated_crop": "Tomato/Tobacco",
+      "disease_name": "Mosaic Disease",
+      "data_source": "NCBI Nucleotide",
+      "fetch_date": "2026-02-22T00:00:00Z",
+      "error": null,
+      "ndvi_correlation_score": 0.58,
+      "ndvi_risk_zone": "Moderate Stress",
+      "representative_ndvi": 0.42
+    },
+    {
+      "name": "Rice Blast Fungus",
+      "accession": "NC_017850",
+      "description": "Magnaporthe oryzae causes rice blast, the most destructive fungal disease of rice, responsible for significant yield losses globally.",
+      "organism": "Magnaporthe oryzae 70-15",
+      "taxonomy": [
+        "Eukaryota",
+        "Fungi",
+        "Dikarya",
+        "Ascomycota",
+        "Pezizomycotina",
+        "Sordariomycetes",
+        "Sordariomycetidae",
+        "Magnaporthales",
+        "Magnaporthaceae",
+        "Pyricularia"
+      ],
+      "sequence_length_bp": 3947040,
+      "gc_content_percent": 51.86,
+      "associated_crop": "Rice",
+      "disease_name": "Rice Blast",
+      "data_source": "NCBI Nucleotide",
+      "fetch_date": "2026-02-22T00:00:00Z",
+      "error": null,
+      "ndvi_correlation_score": 0.69,
+      "ndvi_risk_zone": "Moderate Stress",
+      "representative_ndvi": 0.31
+    },
+    {
+      "name": "Potato Late Blight",
+      "accession": "NC_015247",
+      "description": "Phytophthora infestans is an oomycete responsible for the Irish Potato Famine (1840s) and remains a major threat to solanaceous crops.",
+      "organism": "Phytophthora infestans T30-4",
+      "taxonomy": [
+        "Eukaryota",
+        "Stramenopiles",
+        "Oomycota",
+        "Peronosporales",
+        "Peronosporaceae",
+        "Phytophthora"
+      ],
+      "sequence_length_bp": 228554,
+      "gc_content_percent": 49.77,
+      "associated_crop": "Potato/Tomato",
+      "disease_name": "Late Blight",
+      "data_source": "NCBI Nucleotide",
+      "fetch_date": "2026-02-22T00:00:00Z",
+      "error": null,
+      "ndvi_correlation_score": 0.75,
+      "ndvi_risk_zone": "Moderate Stress",
+      "representative_ndvi": 0.25
+    },
+    {
+      "name": "Wheat Stripe Rust",
+      "accession": "NC_014069",
+      "description": "Puccinia striiformis f.sp. tritici causes yellow stripe rust on wheat, reducing grain yield by up to 70% under epidemic conditions.",
+      "organism": "Puccinia striiformis f. sp. tritici PST-78",
+      "taxonomy": [
+        "Eukaryota",
+        "Fungi",
+        "Dikarya",
+        "Basidiomycota",
+        "Pucciniomycotina",
+        "Pucciniomycetes",
+        "Pucciniales",
+        "Pucciniaceae",
+        "Puccinia"
+      ],
+      "sequence_length_bp": 89222,
+      "gc_content_percent": 47.32,
+      "associated_crop": "Wheat",
+      "disease_name": "Stripe Rust",
+      "data_source": "NCBI Nucleotide",
+      "fetch_date": "2026-02-22T00:00:00Z",
+      "error": null,
+      "ndvi_correlation_score": 0.62,
+      "ndvi_risk_zone": "Moderate Stress",
+      "representative_ndvi": 0.38
+    }
+  ]
+}
