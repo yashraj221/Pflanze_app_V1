@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Pflanze: AI-Powered Crop Health & Bioinformatics Platform"
+authors:
+  - family-names: "Yashraj"
+    given-names: ""
+version: 1.0.0
+date-released: 2026-02-22
+license: MIT
+repository-code: "https://github.com/yashraj221/Pflanze_app_V1"
+keywords:
+  - bioinformatics
+  - precision-agriculture
+  - plant-disease-detection
+  - ndvi
+  - remote-sensing
+  - crop-monitoring
+abstract: >
+  Pflanze is an integrated bioinformatics and precision agriculture platform
+  that combines satellite-based NDVI vegetation stress monitoring, AI-driven
+  plant disease detection, and Biopython-powered pathogen sequence analysis
+  from NCBI. Designed for research and field deployment in Indian agricultural
+  conditions.
