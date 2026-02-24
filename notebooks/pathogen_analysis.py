@@ -27,10 +27,8 @@ from Bio.SeqUtils import gc_fraction
 # ---------------------------------------------------------------------------
 
 # Always set your email when using NCBI Entrez to comply with NCBI policies.
-# IMPORTANT: Replace the placeholder below with your real email address.
-# Leaving it as "your@email.com" violates NCBI's Entrez usage policy and
 # may result in your IP being blocked. See: https://www.ncbi.nlm.nih.gov/books/NBK25497/
-Entrez.email = "your@email.com"
+Entrez.email = "yashrajpatil250@gmail.com"
 
 # Runtime guard: refuse to run with the placeholder email
 if Entrez.email == "your@email.com":
