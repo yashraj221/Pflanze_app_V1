@@ -1,6 +1,6 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10.5281/zenodo.18756399.svg)](https://doi.org/10.5281/zenodo.10.5281/zenodo.18756399)
 # Pflanze — AI-Powered Crop Health & Bioinformatics Platform
 
+![[DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18756399.svg)](https://doi.org/10.5281/zenodo.18756399)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Language](https://img.shields.io/badge/Language-Python%20%2B%20HTML-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-Web%20%2B%20Mobile-orange.svg)
