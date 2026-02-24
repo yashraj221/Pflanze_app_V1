@@ -8,6 +8,7 @@ version: 1.0.0
 date-released: 2026-02-22
 license: MIT
 repository-code: "https://github.com/yashraj221/Pflanze_app_V1"
+doi: 10.5281/zenodo.18756399
 keywords:
   - bioinformatics
   - precision-agriculture
