@@ -215,12 +215,12 @@ If you use Pflanze in your research, please cite it using the [`CITATION.cff`](C
   url       = {https://github.com/yashraj221/Pflanze_app_V1},
   license   = {MIT}
 }
-```
+````
 
----
+----
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
 
----
+----
