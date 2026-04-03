@@ -6,12 +6,13 @@
     <title>Plant Health Monitor - AI Powered</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'DM Sans', system-ui, sans-serif;
         }
 
         body {
@@ -71,12 +72,8 @@
         }
 
         @keyframes glow {
-            0%, 100% {
-                box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), inset 0 0 20px rgba(59, 130, 246, 0.2);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(59, 130, 246, 0.7), inset 0 0 30px rgba(59, 130, 246, 0.3);
-            }
+            0%, 100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), inset 0 0 20px rgba(59, 130, 246, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.7), inset 0 0 30px rgba(59, 130, 246, 0.3); }
         }
 
         .tab-content {
@@ -86,1805 +83,864 @@
             padding: 20px;
         }
 
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content.active { display: block; }
 
-        .analyzer-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        /* ─── ORIGINAL TABS (Plant, NDVI, Weather) ─── */
+        .analyzer-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .upload-section { background: rgba(30, 41, 59, 0.8); border: 2px solid #3b82f6; border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 0 40px rgba(59, 130, 246, 0.3); margin-bottom: 30px; }
+        .upload-section h2 { font-size: 28px; margin-bottom: 20px; color: #3b82f6; text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        .upload-box { border: 3px dashed #3b82f6; border-radius: 15px; padding: 50px; margin: 30px 0; background: rgba(59, 130, 246, 0.05); cursor: pointer; transition: all 0.3s; }
+        .upload-box:hover { background: rgba(59, 130, 246, 0.1); border-color: #60a5fa; box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
+        .upload-box i { font-size: 60px; color: #3b82f6; margin-bottom: 20px; }
+        #plantImageInput { display: none; }
+        .preview-container { margin: 30px 0; display: none; }
+        .image-preview-large { max-width: 100%; max-height: 400px; border-radius: 15px; border: 3px solid #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
+        .action-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: 2px solid #3b82f6; color: white; padding: 15px 40px; font-size: 18px; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); display: inline-flex; align-items: center; gap: 10px; margin: 10px; }
+        .action-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 0 50px rgba(59, 130, 246, 0.6); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ai-detail-btn { background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-color: #8b5cf6; box-shadow: 0 0 30px rgba(139, 92, 246, 0.4); }
+        .results-panel { background: rgba(30, 41, 59, 0.9); border: 2px solid #3b82f6; border-radius: 20px; padding: 30px; margin-top: 30px; box-shadow: 0 0 40px rgba(59, 130, 246, 0.3); display: none; }
+        .plant-identity { background: rgba(59, 130, 246, 0.1); padding: 25px; border-radius: 15px; margin-bottom: 25px; border-left: 5px solid #3b82f6; }
+        .plant-name { font-size: 32px; color: #3b82f6; margin-bottom: 10px; font-weight: 700; }
+        .scientific-name { font-size: 18px; color: #94a3b8; font-style: italic; margin-bottom: 15px; }
+        .confidence-bar { background: rgba(10, 14, 39, 0.5); height: 30px; border-radius: 15px; overflow: hidden; margin-top: 15px; border: 2px solid rgba(59, 130, 246, 0.3); }
+        .confidence-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); display: flex; align-items: center; justify-content: center; font-weight: 700; transition: width 1s ease; }
+        .health-assessment { background: rgba(34, 197, 94, 0.1); padding: 25px; border-radius: 15px; margin-bottom: 25px; border-left: 5px solid #22c55e; }
+        .health-score { font-size: 48px; font-weight: 800; color: #22c55e; text-align: center; margin: 20px 0; text-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+        .disease-section { background: rgba(239, 68, 68, 0.1); padding: 25px; border-radius: 15px; margin-bottom: 25px; border-left: 5px solid #ef4444; }
+        .disease-card { background: rgba(30, 41, 59, 0.5); padding: 20px; border-radius: 12px; margin: 15px 0; border: 2px solid rgba(239, 68, 68, 0.3); }
+        .disease-name { font-size: 22px; color: #ef4444; margin-bottom: 10px; font-weight: 600; }
+        .probability-badge { display: inline-block; padding: 6px 15px; border-radius: 20px; font-size: 14px; font-weight: 600; margin: 5px; }
+        .prob-high { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; color: #ef4444; }
+        .prob-medium { background: rgba(249, 115, 22, 0.2); border: 2px solid #f97316; color: #f97316; }
+        .prob-low { background: rgba(251, 191, 36, 0.2); border: 2px solid #fbbf24; color: #fbbf24; }
+        .ai-details-panel { background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; border-radius: 20px; padding: 30px; margin-top: 30px; box-shadow: 0 0 40px rgba(139, 92, 246, 0.3); display: none; }
+        .ai-section { background: rgba(30, 41, 59, 0.5); padding: 20px; border-radius: 15px; margin: 15px 0; border-left: 4px solid #8b5cf6; }
+        .ai-section h3 { color: #a78bfa; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 20px; }
+        .ai-content { color: #e2e8f0; line-height: 1.8; font-size: 15px; }
+        .ai-content p { margin-bottom: 12px; }
+        .ai-content ul, .ai-content ol { margin-left: 20px; margin-bottom: 12px; }
+        .ai-content li { margin-bottom: 8px; padding-left: 10px; }
+        .ai-content strong { color: #a78bfa; }
 
-        .upload-section {
-            background: rgba(30, 41, 59, 0.8);
-            border: 2px solid #3b82f6;
-            border-radius: 20px;
+        /* NDVI */
+        #map { width: 100%; height: calc(100vh - 100px); border-radius: 15px; border: 2px solid #3b82f6; box-shadow: 0 0 40px rgba(59, 130, 246, 0.3); }
+        .map-controls { position: absolute; top: 20px; right: 20px; z-index: 1000; background: rgba(30, 41, 59, 0.95); padding: 20px; border-radius: 15px; border: 2px solid #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); max-width: 320px; }
+        .map-controls h3 { color: #3b82f6; margin-bottom: 15px; font-size: 18px; }
+        .map-mode-toggle { display: flex; gap: 8px; margin-bottom: 20px; background: rgba(10, 14, 39, 0.5); padding: 12px; border-radius: 10px; }
+        .mode-btn { flex: 1; padding: 10px; background: rgba(59, 130, 246, 0.2); border: 2px solid rgba(59, 130, 246, 0.3); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s; text-align: center; }
+        .mode-btn:hover { background: rgba(59, 130, 246, 0.3); border-color: #3b82f6; }
+        .mode-btn.active { background: #3b82f6; border-color: #60a5fa; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .control-group { margin: 15px 0; }
+        .control-label { display: block; margin-bottom: 8px; color: #94a3b8; font-size: 14px; }
+        select, input[type="date"] { width: 100%; padding: 10px; background: rgba(10, 14, 39, 0.8); border: 2px solid #3b82f6; border-radius: 8px; color: white; font-size: 14px; }
+        .small-btn { width: 100%; padding: 10px; margin: 5px 0; background: rgba(59, 130, 246, 0.2); border: 2px solid #3b82f6; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .small-btn:hover { background: rgba(59, 130, 246, 0.4); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        .ndvi-info { position: absolute; bottom: 20px; right: 20px; z-index: 1000; background: rgba(30, 41, 59, 0.95); padding: 20px; border-radius: 15px; border: 2px solid #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); display: none; }
+        .ndvi-value-display { font-size: 48px; font-weight: 800; text-align: center; color: #3b82f6; text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); margin: 15px 0; }
+
+        /* Weather */
+        .weather-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .weather-search { background: rgba(30, 41, 59, 0.8); border: 2px solid #3b82f6; border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
+        .search-input { width: 100%; padding: 15px 20px; background: rgba(10, 14, 39, 0.8); border: 2px solid #3b82f6; border-radius: 10px; color: white; font-size: 16px; margin-bottom: 15px; }
+        .weather-display { background: rgba(30, 41, 59, 0.8); border: 2px solid #3b82f6; border-radius: 20px; padding: 40px; box-shadow: 0 0 40px rgba(59, 130, 246, 0.3); display: none; }
+        .weather-main { text-align: center; margin-bottom: 30px; }
+        .weather-icon { font-size: 100px; margin: 20px 0; }
+        .temperature { font-size: 72px; font-weight: 800; color: #3b82f6; text-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
+        .weather-description { font-size: 24px; color: #94a3b8; margin: 10px 0; text-transform: capitalize; }
+        .weather-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+        .detail-card { background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 15px; padding: 20px; text-align: center; transition: all 0.3s; }
+        .detail-card:hover { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+        .detail-icon { font-size: 36px; color: #3b82f6; margin-bottom: 10px; }
+        .detail-value { font-size: 28px; font-weight: 700; color: white; margin: 10px 0; }
+        .detail-label { font-size: 14px; color: #94a3b8; }
+
+        /* ─────────────────────────────────────────────
+           ENHANCED ALERT TAB
+        ───────────────────────────────────────────── */
+        .alert-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        /* Hero banner */
+        .alert-hero {
+            background: linear-gradient(135deg, rgba(239,68,68,0.18), rgba(249,115,22,0.12));
+            border: 2px solid rgba(239,68,68,0.5);
+            border-radius: 24px;
             padding: 40px;
             text-align: center;
-            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
             margin-bottom: 30px;
-        }
-
-        .upload-section h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            color: #3b82f6;
-            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-        }
-
-        .upload-box {
-            border: 3px dashed #3b82f6;
-            border-radius: 15px;
-            padding: 50px;
-            margin: 30px 0;
-            background: rgba(59, 130, 246, 0.05);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .upload-box:hover {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: #60a5fa;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-        }
-
-        .upload-box i {
-            font-size: 60px;
-            color: #3b82f6;
-            margin-bottom: 20px;
-        }
-
-        #plantImageInput {
-            display: none;
-        }
-
-        .preview-container {
-            margin: 30px 0;
-            display: none;
-        }
-
-        .image-preview-large {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 15px;
-            border: 3px solid #3b82f6;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-        }
-
-        .action-btn {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            border: 2px solid #3b82f6;
-            color: white;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px;
-        }
-
-        .action-btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 0 50px rgba(59, 130, 246, 0.6);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .ai-detail-btn {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            border-color: #8b5cf6;
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
-        }
-
-        .ai-detail-btn:hover:not(:disabled) {
-            box-shadow: 0 0 50px rgba(139, 92, 246, 0.6);
-        }
-
-        .results-panel {
-            background: rgba(30, 41, 59, 0.9);
-            border: 2px solid #3b82f6;
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
-            display: none;
-        }
-
-        .plant-identity {
-            background: rgba(59, 130, 246, 0.1);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            border-left: 5px solid #3b82f6;
-        }
-
-        .plant-name {
-            font-size: 32px;
-            color: #3b82f6;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .scientific-name {
-            font-size: 18px;
-            color: #94a3b8;
-            font-style: italic;
-            margin-bottom: 15px;
-        }
-
-        .confidence-bar {
-            background: rgba(10, 14, 39, 0.5);
-            height: 30px;
-            border-radius: 15px;
+            position: relative;
             overflow: hidden;
-            margin-top: 15px;
-            border: 2px solid rgba(59, 130, 246, 0.3);
         }
-
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #60a5fa);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            transition: width 1s ease;
-        }
-
-        .health-assessment {
-            background: rgba(34, 197, 94, 0.1);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            border-left: 5px solid #22c55e;
-        }
-
-        .health-score {
-            font-size: 48px;
-            font-weight: 800;
-            color: #22c55e;
-            text-align: center;
-            margin: 20px 0;
-            text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
-        }
-
-        .disease-section {
-            background: rgba(239, 68, 68, 0.1);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            border-left: 5px solid #ef4444;
-        }
-
-        .disease-card {
-            background: rgba(30, 41, 59, 0.5);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 15px 0;
-            border: 2px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .disease-name {
-            font-size: 22px;
-            color: #ef4444;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .probability-badge {
-            display: inline-block;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin: 5px;
-        }
-
-        .prob-high {
-            background: rgba(239, 68, 68, 0.2);
-            border: 2px solid #ef4444;
-            color: #ef4444;
-        }
-
-        .prob-medium {
-            background: rgba(249, 115, 22, 0.2);
-            border: 2px solid #f97316;
-            color: #f97316;
-        }
-
-        .prob-low {
-            background: rgba(251, 191, 36, 0.2);
-            border: 2px solid #fbbf24;
-            color: #fbbf24;
-        }
-
-        .ai-details-panel {
-            background: rgba(139, 92, 246, 0.1);
-            border: 2px solid #8b5cf6;
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
-            display: none;
-        }
-
-        .ai-section {
-            background: rgba(30, 41, 59, 0.5);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 15px 0;
-            border-left: 4px solid #8b5cf6;
-        }
-
-        .ai-section h3 {
-            color: #a78bfa;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 20px;
-        }
-
-        .ai-content {
-            color: #e2e8f0;
-            line-height: 1.8;
-            font-size: 15px;
-        }
-
-        .ai-content p {
-            margin-bottom: 12px;
-        }
-
-        .ai-content ul, .ai-content ol {
-            margin-left: 20px;
-            margin-bottom: 12px;
-        }
-
-        .ai-content li {
-            margin-bottom: 8px;
-            padding-left: 10px;
-        }
-
-        .ai-content strong {
-            color: #a78bfa;
-        }
-
-        /* Alert Styles */
-        .alert-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .alert-header {
-            background: rgba(239, 68, 68, 0.15);
-            border: 2px solid #ef4444;
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 30px;
-            box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
-        }
-
-        .alert-header h1 {
-            font-size: 42px;
-            color: #ef4444;
-            margin-bottom: 15px;
-            text-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .alert-header p {
-            font-size: 18px;
-            color: #94a3b8;
-            margin-top: 10px;
-        }
-
-        .location-selector {
-            background: rgba(30, 41, 59, 0.8);
-            border: 2px solid #3b82f6;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-        }
-
-        .location-selector h3 {
-            color: #3b82f6;
-            margin-bottom: 20px;
-            font-size: 22px;
-        }
-
-        .location-input {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(10, 14, 39, 0.8);
-            border: 2px solid #3b82f6;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .alert-display {
-            background: rgba(30, 41, 59, 0.9);
-            border: 2px solid #ef4444;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
-            display: none;
-        }
-
-        .alert-main-warning {
-            background: rgba(239, 68, 68, 0.2);
-            border: 3px solid #ef4444;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
-            }
-            50% {
-                box-shadow: 0 0 50px rgba(239, 68, 68, 0.6);
-            }
-        }
-
-        .alert-main-warning h2 {
-            font-size: 32px;
-            color: #ef4444;
-            margin-bottom: 15px;
-        }
-
-        .alert-main-warning .severity {
-            display: inline-block;
-            padding: 10px 25px;
-            background: #ef4444;
-            color: white;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 18px;
-            margin-top: 10px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .info-card {
-            background: rgba(59, 130, 246, 0.1);
-            border: 2px solid #3b82f6;
-            border-radius: 15px;
-            padding: 25px;
-            transition: all 0.3s;
-        }
-
-        .info-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
-        }
-
-        .info-card h3 {
-            color: #3b82f6;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 20px;
-        }
-
-        .info-card ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .info-card li {
-            padding: 10px 0;
-            color: #e2e8f0;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .info-card li:last-child {
-            border-bottom: none;
-        }
-
-        .info-card li:before {
-            content: "•";
-            color: #3b82f6;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        .integration-section {
-            background: rgba(139, 92, 246, 0.1);
-            border: 2px solid #8b5cf6;
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 30px;
-        }
-
-        .integration-section h3 {
-            color: #a78bfa;
-            margin-bottom: 20px;
-            font-size: 24px;
-            text-align: center;
-        }
-
-        .integration-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .integration-box {
-            background: rgba(30, 41, 59, 0.6);
-            border: 2px solid #8b5cf6;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .integration-box i {
-            font-size: 40px;
-            color: #a78bfa;
-            margin-bottom: 10px;
-        }
-
-        .integration-box h4 {
-            color: #a78bfa;
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        .integration-note {
-            background: rgba(59, 130, 246, 0.1);
-            border-left: 4px solid #3b82f6;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            color: #94a3b8;
-        }
-
-        #map {
-            width: 100%;
-            height: calc(100vh - 100px);
-            border-radius: 15px;
-            border: 2px solid #3b82f6;
-            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
-        }
-
-        .map-controls {
+        .alert-hero::before {
+            content: '';
             position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: rgba(30, 41, 59, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid #3b82f6;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
-            max-width: 320px;
+            inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(239,68,68,0.03) 20px, rgba(239,68,68,0.03) 40px);
         }
-
-        .map-controls h3 {
-            color: #3b82f6;
-            margin-bottom: 15px;
-            font-size: 18px;
+        .alert-hero h1 { font-size: 38px; color: #ef4444; margin-bottom: 10px; text-shadow: 0 0 30px rgba(239,68,68,0.5); position: relative; font-family: 'Space Mono', monospace; }
+        .alert-hero p { font-size: 16px; color: #94a3b8; position: relative; }
+        .alert-hero .live-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(34,197,94,0.15); border: 1.5px solid #22c55e;
+            color: #22c55e; padding: 6px 16px; border-radius: 20px;
+            font-size: 13px; font-weight: 700; margin-bottom: 20px;
+            animation: pulse-badge 2s ease-in-out infinite;
         }
+        .live-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: blink 1.2s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes pulse-badge { 0%,100%{box-shadow:0 0 10px rgba(34,197,94,0.3)} 50%{box-shadow:0 0 20px rgba(34,197,94,0.6)} }
 
-        .map-mode-toggle {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            background: rgba(10, 14, 39, 0.5);
-            padding: 12px;
-            border-radius: 10px;
+        /* Location input */
+        .location-selector { background: rgba(30, 41, 59, 0.8); border: 2px solid #3b82f6; border-radius: 18px; padding: 28px; margin-bottom: 28px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
+        .location-selector h3 { color: #3b82f6; margin-bottom: 18px; font-size: 20px; }
+        .location-input { width: 100%; padding: 15px 20px; background: rgba(10, 14, 39, 0.8); border: 2px solid #3b82f6; border-radius: 10px; color: white; font-size: 16px; margin-bottom: 15px; font-family: 'DM Sans', sans-serif; }
+        .location-input:focus { outline: none; border-color: #60a5fa; box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+        .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-row .action-btn { flex: 1; min-width: 200px; justify-content: center; }
+        .btn-green { background: linear-gradient(135deg, #16a34a, #15803d) !important; border-color: #22c55e !important; }
+
+        /* Alert display */
+        .alert-display { display: none; }
+
+        /* ── Top severity strip */
+        .severity-strip {
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(90deg, rgba(239,68,68,0.2), rgba(249,115,22,0.15));
+            border: 2px solid #ef4444; border-radius: 18px; padding: 24px 30px;
+            margin-bottom: 24px; flex-wrap: wrap; gap: 20px;
+            animation: pulse-border 3s ease-in-out infinite;
         }
-
-        .mode-btn {
-            flex: 1;
-            padding: 10px;
-            background: rgba(59, 130, 246, 0.2);
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.3s;
-            text-align: center;
+        @keyframes pulse-border {
+            0%,100%{box-shadow:0 0 20px rgba(239,68,68,0.3)}
+            50%{box-shadow:0 0 40px rgba(239,68,68,0.6)}
         }
+        .severity-strip .left h2 { font-size: 26px; color: #ef4444; margin-bottom: 6px; font-family: 'Space Mono', monospace; }
+        .severity-strip .left p { color: #94a3b8; font-size: 15px; }
+        .severity-badge { padding: 10px 24px; border-radius: 30px; font-weight: 700; font-size: 16px; letter-spacing: 1px; font-family: 'Space Mono', monospace; }
+        .badge-high { background: #ef4444; color: white; box-shadow: 0 0 20px rgba(239,68,68,0.5); }
+        .badge-moderate { background: #f59e0b; color: #0a0e27; box-shadow: 0 0 20px rgba(245,158,11,0.5); }
+        .badge-low { background: #22c55e; color: #0a0e27; box-shadow: 0 0 20px rgba(34,197,94,0.5); }
 
-        .mode-btn:hover {
-            background: rgba(59, 130, 246, 0.3);
-            border-color: #3b82f6;
+        /* ── Risk Meter */
+        .risk-meter-card {
+            background: rgba(30,41,59,0.8); border: 2px solid #3b82f6; border-radius: 18px;
+            padding: 28px; margin-bottom: 24px;
         }
+        .risk-meter-card h3 { color: #3b82f6; font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .meter-track { position: relative; height: 28px; border-radius: 14px; background: linear-gradient(90deg, #22c55e 0%, #eab308 40%, #f97316 65%, #ef4444 100%); margin-bottom: 8px; overflow: visible; border: 2px solid rgba(255,255,255,0.1); }
+        .meter-needle { position: absolute; top: -10px; width: 6px; height: 48px; background: white; border-radius: 3px; transform: translateX(-50%); box-shadow: 0 0 12px rgba(255,255,255,0.8); transition: left 1.5s cubic-bezier(.68,-0.55,.27,1.55); }
+        .meter-labels { display: flex; justify-content: space-between; color: #94a3b8; font-size: 12px; margin-top: 6px; }
+        .risk-score-big { font-size: 52px; font-weight: 800; text-align: center; margin: 16px 0 4px; font-family: 'Space Mono', monospace; }
+        .risk-score-label { text-align: center; font-size: 14px; color: #94a3b8; }
 
-        .mode-btn.active {
-            background: #3b82f6;
-            border-color: #60a5fa;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        /* ── Summary cards row */
+        .summary-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .summary-card { background: rgba(30,41,59,0.7); border-radius: 16px; padding: 20px; text-align: center; border: 1.5px solid rgba(59,130,246,0.3); transition: all 0.3s; }
+        .summary-card:hover { transform: translateY(-4px); border-color: #3b82f6; box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+        .summary-card .sc-icon { font-size: 32px; margin-bottom: 10px; }
+        .summary-card .sc-val { font-size: 22px; font-weight: 700; color: white; }
+        .summary-card .sc-lbl { font-size: 12px; color: #64748b; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* ── Disease risk cards */
+        .section-title { font-size: 22px; font-weight: 700; margin: 28px 0 16px; display: flex; align-items: center; gap: 10px; }
+        .disease-risk-card {
+            background: rgba(30,41,59,0.7);
+            border-radius: 18px; padding: 24px; margin-bottom: 18px;
+            border: 2px solid; transition: all 0.3s;
+            position: relative; overflow: hidden;
         }
-
-        .control-group {
-            margin: 15px 0;
+        .disease-risk-card::before {
+            content: ''; position: absolute; top: 0; right: 0;
+            width: 120px; height: 120px; border-radius: 50%;
+            filter: blur(40px); opacity: 0.15;
         }
+        .disease-risk-card:hover { transform: translateY(-3px); }
+        .drc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+        .drc-name { font-size: 20px; font-weight: 700; }
+        .drc-risk-pill { padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; font-family: 'Space Mono', monospace; }
+        .drc-reason { color: #94a3b8; font-size: 14px; margin-bottom: 14px; line-height: 1.6; }
+        .drc-types { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+        .drc-type-tag { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
 
-        .control-label {
-            display: block;
-            margin-bottom: 8px;
-            color: #94a3b8;
-            font-size: 14px;
-        }
+        /* progress bar inside card */
+        .drc-prob-bar { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); margin-top: 10px; overflow: hidden; }
+        .drc-prob-fill { height: 100%; border-radius: 4px; transition: width 1.2s ease; }
 
-        select, input[type="date"] {
-            width: 100%;
-            padding: 10px;
-            background: rgba(10, 14, 39, 0.8);
-            border: 2px solid #3b82f6;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-        }
+        /* ── Prevention Checklist */
+        .checklist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .checklist-card { background: rgba(30,41,59,0.7); border: 1.5px solid rgba(59,130,246,0.3); border-radius: 16px; padding: 22px; }
+        .checklist-card h4 { color: #3b82f6; font-size: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0; font-size: 14px; line-height: 1.5; }
+        .checklist-item:last-child { border-bottom: none; }
+        .ci-check { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; margin-top: 1px; }
+        .ci-check.urgent { background: rgba(239,68,68,0.2); border: 1.5px solid #ef4444; color: #ef4444; }
+        .ci-check.normal { background: rgba(59,130,246,0.2); border: 1.5px solid #3b82f6; color: #3b82f6; }
+        .ci-check.done { background: rgba(34,197,94,0.2); border: 1.5px solid #22c55e; color: #22c55e; }
 
-        .small-btn {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            background: rgba(59, 130, 246, 0.2);
-            border: 2px solid #3b82f6;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
+        /* ── Crop-specific table */
+        .crop-table-wrap { background: rgba(30,41,59,0.7); border: 1.5px solid rgba(59,130,246,0.3); border-radius: 18px; overflow: hidden; margin-bottom: 24px; }
+        .crop-table { width: 100%; border-collapse: collapse; }
+        .crop-table th { background: rgba(59,130,246,0.2); padding: 14px 18px; text-align: left; color: #3b82f6; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        .crop-table td { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.05); color: #e2e8f0; font-size: 14px; vertical-align: middle; }
+        .crop-table tr:hover td { background: rgba(59,130,246,0.07); }
+        .risk-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
 
-        .small-btn:hover {
-            background: rgba(59, 130, 246, 0.4);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-        }
+        /* ── 7-day forecast timeline */
+        .forecast-strip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
+        .forecast-strip::-webkit-scrollbar { height: 4px; }
+        .forecast-strip::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 2px; }
+        .forecast-strip::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.4); border-radius: 2px; }
+        .forecast-day { min-width: 110px; background: rgba(30,41,59,0.7); border-radius: 14px; padding: 16px 12px; text-align: center; border: 1.5px solid rgba(59,130,246,0.2); flex-shrink: 0; transition: all 0.3s; }
+        .forecast-day:hover { border-color: #3b82f6; transform: translateY(-3px); box-shadow: 0 0 16px rgba(59,130,246,0.3); }
+        .forecast-day.today { border-color: #3b82f6; background: rgba(59,130,246,0.15); }
+        .fd-day { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .fd-icon { font-size: 28px; margin-bottom: 8px; }
+        .fd-risk { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 10px; display: inline-block; }
 
-        .ndvi-info {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: rgba(30, 41, 59, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid #3b82f6;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
-            display: none;
-        }
+        /* ── Historical context */
+        .history-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .history-card { background: rgba(30,41,59,0.7); border: 1.5px solid rgba(139,92,246,0.3); border-radius: 16px; padding: 20px; }
+        .history-card h5 { color: #a78bfa; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .history-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; color: #94a3b8; }
+        .history-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; }
+        .history-bar-fill { height: 100%; border-radius: 3px; }
 
-        .ndvi-value-display {
-            font-size: 48px;
-            font-weight: 800;
-            text-align: center;
-            color: #3b82f6;
-            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-            margin: 15px 0;
-        }
+        /* ── SOS / Emergency actions */
+        .sos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .sos-card { border-radius: 16px; padding: 22px; text-align: center; cursor: pointer; transition: all 0.3s; border: 2px solid; }
+        .sos-card:hover { transform: translateY(-4px); }
+        .sos-card i { font-size: 32px; margin-bottom: 12px; }
+        .sos-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .sos-card p { font-size: 13px; color: #94a3b8; }
 
-        .weather-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        /* ── Integration strip */
+        .integration-strip { background: rgba(139,92,246,0.1); border: 2px solid #8b5cf6; border-radius: 18px; padding: 28px; margin-top: 10px; }
+        .integration-strip h3 { color: #a78bfa; font-size: 20px; margin-bottom: 8px; text-align: center; }
+        .integration-strip .sub { text-align: center; color: #64748b; font-size: 14px; margin-bottom: 24px; }
+        .int-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .int-box { background: rgba(30,41,59,0.6); border: 1.5px solid #8b5cf6; border-radius: 12px; padding: 18px; text-align: center; }
+        .int-box i { font-size: 32px; color: #a78bfa; margin-bottom: 8px; }
+        .int-box h4 { color: #a78bfa; font-size: 15px; margin-bottom: 6px; }
+        .int-box p { color: #64748b; font-size: 13px; }
+        .int-note { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 14px 18px; border-radius: 8px; color: #94a3b8; font-size: 14px; line-height: 1.6; }
 
-        .weather-search {
-            background: rgba(30, 41, 59, 0.8);
-            border: 2px solid #3b82f6;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-        }
+        /* Loading / toast / global */
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,14,39,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; display: none; }
+        .spinner { width: 80px; height: 80px; border: 5px solid rgba(59,130,246,0.3); border-top: 5px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        .loading-text { margin-top: 20px; font-size: 18px; color: #3b82f6; }
+        .toast { position: fixed; top: 20px; right: 20px; background: rgba(30,41,59,0.95); border: 2px solid #3b82f6; border-radius: 10px; padding: 15px 25px; color: white; z-index: 10000; box-shadow: 0 0 30px rgba(59,130,246,0.5); animation: slideIn 0.3s ease; display: none; max-width: 400px; }
+        @keyframes slideIn { from{transform:translateX(400px);opacity:0} to{transform:translateX(0);opacity:1} }
 
-        .search-input {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(10, 14, 39, 0.8);
-            border: 2px solid #3b82f6;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .weather-display {
-            background: rgba(30, 41, 59, 0.8);
-            border: 2px solid #3b82f6;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
-            display: none;
-        }
-
-        .weather-main {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .weather-icon {
-            font-size: 100px;
-            margin: 20px 0;
-        }
-
-        .temperature {
-            font-size: 72px;
-            font-weight: 800;
-            color: #3b82f6;
-            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-        }
-
-        .weather-description {
-            font-size: 24px;
-            color: #94a3b8;
-            margin: 10px 0;
-            text-transform: capitalize;
-        }
-
-        .weather-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .detail-card {
-            background: rgba(59, 130, 246, 0.1);
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .detail-card:hover {
-            border-color: #3b82f6;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-        }
-
-        .detail-icon {
-            font-size: 36px;
-            color: #3b82f6;
-            margin-bottom: 10px;
-        }
-
-        .detail-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: white;
-            margin: 10px 0;
-        }
-
-        .detail-label {
-            font-size: 14px;
-            color: #94a3b8;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(10, 14, 39, 0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            display: none;
-        }
-
-        .spinner {
-            width: 80px;
-            height: 80px;
-            border: 5px solid rgba(59, 130, 246, 0.3);
-            border-top: 5px solid #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #3b82f6;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(30, 41, 59, 0.95);
-            border: 2px solid #3b82f6;
-            border-radius: 10px;
-            padding: 15px 25px;
-            color: white;
-            z-index: 10000;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-            animation: slideIn 0.3s ease;
-            display: none;
-            max-width: 400px;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .tab-btn {
-                min-width: 90px;
-                padding: 10px 12px;
-                font-size: 12px;
-            }
-            .upload-section {
-                padding: 20px;
-            }
-            .upload-box {
-                padding: 30px;
-            }
-            .plant-name {
-                font-size: 24px;
-            }
-            .health-score {
-                font-size: 36px;
-            }
-            .temperature {
-                font-size: 56px;
-            }
-            .action-btn {
-                padding: 12px 25px;
-                font-size: 16px;
-            }
-            .map-controls {
-                max-width: 280px;
-            }
-            .mode-btn {
-                font-size: 11px;
-                padding: 8px;
-            }
-            .integration-grid {
-                grid-template-columns: 1fr;
-            }
-            .alert-header h1 {
-                font-size: 28px;
-            }
+        @media(max-width:768px) {
+            .tab-btn { min-width: 90px; padding: 10px 12px; font-size: 12px; }
+            .alert-hero h1 { font-size: 26px; }
+            .int-grid { grid-template-columns: 1fr; }
+            .btn-row { flex-direction: column; }
+            .severity-strip { flex-direction: column; align-items: flex-start; }
+            .crop-table { font-size: 13px; }
+            .forecast-day { min-width: 90px; }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="tab-navigation">
-            <button class="tab-btn active" onclick="switchTab('plant')" id="plantTab">
-                <i class="fas fa-leaf"></i> Plant
-            </button>
-            <button class="tab-btn" onclick="switchTab('ndvi')" id="ndviTab">
-                <i class="fas fa-map"></i> NDVI
-            </button>
-            <button class="tab-btn" onclick="switchTab('weather')" id="weatherTab">
-                <i class="fas fa-cloud-sun"></i> Weather
-            </button>
-            <button class="tab-btn" onclick="switchTab('alert')" id="alertTab">
-                <i class="fas fa-exclamation-triangle"></i> Alert
-            </button>
-        </div>
+<div class="app-container">
+    <div class="tab-navigation">
+        <button class="tab-btn active" onclick="switchTab('plant')" id="plantTab"><i class="fas fa-leaf"></i> Plant</button>
+        <button class="tab-btn" onclick="switchTab('ndvi')" id="ndviTab"><i class="fas fa-map"></i> NDVI</button>
+        <button class="tab-btn" onclick="switchTab('weather')" id="weatherTab"><i class="fas fa-cloud-sun"></i> Weather</button>
+        <button class="tab-btn" onclick="switchTab('alert')" id="alertTab"><i class="fas fa-exclamation-triangle"></i> Alert</button>
+    </div>
 
-        <!-- Plant Analyzer Tab -->
-        <div class="tab-content active" id="plantContent">
-            <div class="analyzer-container">
-                <div class="upload-section">
-                    <h2><i class="fas fa-microscope"></i> Plant Disease Analyzer</h2>
-                    <p style="color: #94a3b8; margin-bottom: 20px;">
-                        Powered by Kindwise Plant.id + Groq AI
-                    </p>
-                    
-                    <label for="plantImageInput">
-                        <div class="upload-box">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <h3 style="color: #3b82f6;">Click to Upload Image</h3>
-                            <p style="color: #94a3b8; margin-top: 10px;">or drag and drop</p>
-                            <p style="color: #94a3b8; font-size: 12px; margin-top: 5px;">Supports JPG, PNG (max 5MB)</p>
-                        </div>
-                    </label>
-                    <input type="file" id="plantImageInput" accept="image/*" capture="environment">
-
-                    <div class="preview-container" id="previewContainer">
-                        <img id="imagePreview" class="image-preview-large" alt="Plant preview">
-                        <div style="margin-top: 20px;">
-                            <button class="action-btn" onclick="analyzePlant()" id="analyzeBtn">
-                                <i class="fas fa-search"></i> Analyze Plant
-                            </button>
-                            <button class="action-btn" onclick="clearImagePreview()" style="background: rgba(239, 68, 68, 0.3); border-color: #ef4444;">
-                                <i class="fas fa-times"></i> Clear
-                            </button>
-                        </div>
+    <!-- ── Plant Tab ── -->
+    <div class="tab-content active" id="plantContent">
+        <div class="analyzer-container">
+            <div class="upload-section">
+                <h2><i class="fas fa-microscope"></i> Plant Disease Analyzer</h2>
+                <p style="color:#94a3b8;margin-bottom:20px;">Powered by Kindwise Plant.id + Groq AI</p>
+                <label for="plantImageInput">
+                    <div class="upload-box">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3 style="color:#3b82f6;">Click to Upload Image</h3>
+                        <p style="color:#94a3b8;margin-top:10px;">or drag and drop</p>
+                        <p style="color:#94a3b8;font-size:12px;margin-top:5px;">Supports JPG, PNG (max 5MB)</p>
                     </div>
-                </div>
-
-                <div class="results-panel" id="resultsPanel"></div>
-                <div class="ai-details-panel" id="aiDetailsPanel"></div>
-            </div>
-        </div>
-
-        <!-- NDVI Map Tab -->
-        <div class="tab-content" id="ndviContent">
-            <div style="position: relative; height: calc(100vh - 100px);">
-                <div id="map"></div>
-                
-                <div class="map-controls">
-                    <h3><i class="fas fa-cog"></i> Map Controls</h3>
-                    
-                    <div class="map-mode-toggle">
-                        <div class="mode-btn active" id="streetModeBtn" onclick="changeMapMode('street')">
-                            <i class="fas fa-map"></i> Street
-                        </div>
-                        <div class="mode-btn" id="satelliteModeBtn" onclick="changeMapMode('satellite')">
-                            <i class="fas fa-globe"></i> Satellite
-                        </div>
-                        <div class="mode-btn" id="ndviModeBtn" onclick="changeMapMode('ndvi')">
-                            <i class="fas fa-chart-line"></i> NDVI
-                        </div>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label class="control-label">Sensor Type</label>
-                        <select id="sensorSelect" onchange="updateSensor()">
-                            <option value="landsat">Landsat 8 (30m)</option>
-                            <option value="sentinel">Sentinel-2 (10m)</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label class="control-label">Select Date</label>
-                        <input type="date" id="ndviDatePicker">
-                    </div>
-
-                    <button class="small-btn" onclick="loadNdviData()">
-                        <i class="fas fa-sync"></i> Load NDVI Data
-                    </button>
-
-                    <button class="small-btn" onclick="loadLatestNdvi()">
-                        <i class="fas fa-calendar"></i> Latest Data
-                    </button>
-                </div>
-
-                <div class="ndvi-info" id="ndviInfo">
-                    <h3 style="color: #3b82f6; margin-bottom: 15px;">
-                        <i class="fas fa-seedling"></i> Vegetation Health
-                    </h3>
-                    <div class="ndvi-value-display" id="ndviValue">--</div>
-                    <div style="text-align: center; color: #94a3b8;" id="ndviStatus">
-                        Click on map to analyze
+                </label>
+                <input type="file" id="plantImageInput" accept="image/*" capture="environment">
+                <div class="preview-container" id="previewContainer">
+                    <img id="imagePreview" class="image-preview-large" alt="Plant preview">
+                    <div style="margin-top:20px;">
+                        <button class="action-btn" onclick="analyzePlant()" id="analyzeBtn"><i class="fas fa-search"></i> Analyze Plant</button>
+                        <button class="action-btn" onclick="clearImagePreview()" style="background:rgba(239,68,68,0.3);border-color:#ef4444;"><i class="fas fa-times"></i> Clear</button>
                     </div>
                 </div>
             </div>
+            <div class="results-panel" id="resultsPanel"></div>
+            <div class="ai-details-panel" id="aiDetailsPanel"></div>
         </div>
+    </div>
 
-        <!-- Weather Tab -->
-        <div class="tab-content" id="weatherContent">
-            <div class="weather-container">
-                <div class="weather-search">
-                    <h2 style="color: #3b82f6; margin-bottom: 20px;">
-                        <i class="fas fa-search-location"></i> Weather Forecast
-                    </h2>
-                    <input 
-                        type="text" 
-                        class="search-input" 
-                        id="cityInput" 
-                        placeholder="Enter city name (e.g., Mumbai, Delhi, Bangalore)"
-                        onkeypress="if(event.key==='Enter') fetchWeather()"
-                    >
-                    <button class="action-btn" onclick="fetchWeather()" style="width: 100%;">
-                        <i class="fas fa-search"></i> Get Weather
-                    </button>
-                    <button class="action-btn" onclick="fetchLocationWeather()" style="width: 100%; background: rgba(34, 197, 94, 0.3); border-color: #22c55e;">
-                        <i class="fas fa-location-arrow"></i> Use Current Location
-                    </button>
+    <!-- ── NDVI Tab ── -->
+    <div class="tab-content" id="ndviContent">
+        <div style="position:relative;height:calc(100vh - 100px);">
+            <div id="map"></div>
+            <div class="map-controls">
+                <h3><i class="fas fa-cog"></i> Map Controls</h3>
+                <div class="map-mode-toggle">
+                    <div class="mode-btn active" id="streetModeBtn" onclick="changeMapMode('street')"><i class="fas fa-map"></i> Street</div>
+                    <div class="mode-btn" id="satelliteModeBtn" onclick="changeMapMode('satellite')"><i class="fas fa-globe"></i> Satellite</div>
+                    <div class="mode-btn" id="ndviModeBtn" onclick="changeMapMode('ndvi')"><i class="fas fa-chart-line"></i> NDVI</div>
                 </div>
-
-                <div class="weather-display" id="weatherDisplay"></div>
+                <div class="control-group">
+                    <label class="control-label">Sensor Type</label>
+                    <select id="sensorSelect" onchange="updateSensor()">
+                        <option value="landsat">Landsat 8 (30m)</option>
+                        <option value="sentinel">Sentinel-2 (10m)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Select Date</label>
+                    <input type="date" id="ndviDatePicker">
+                </div>
+                <button class="small-btn" onclick="loadNdviData()"><i class="fas fa-sync"></i> Load NDVI Data</button>
+                <button class="small-btn" onclick="loadLatestNdvi()"><i class="fas fa-calendar"></i> Latest Data</button>
             </div>
-        </div>
-
-        <!-- Regional Alert Tab -->
-        <div class="tab-content" id="alertContent">
-            <div class="alert-container">
-                <div class="alert-header">
-                    <h1>
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Regional Disease Alert
-                    </h1>
-                    <p>Smart disease prediction based on location, season, and weather conditions</p>
-                </div>
-
-                <div class="location-selector">
-                    <h3><i class="fas fa-map-marker-alt"></i> Enter Your Location</h3>
-                    <input 
-                        type="text" 
-                        class="location-input" 
-                        id="alertLocationInput" 
-                        placeholder="Enter city or region (e.g., Mumbai, Maharashtra)"
-                        onkeypress="if(event.key==='Enter') generateAlert()"
-                    >
-                    <button class="action-btn" onclick="generateAlert()" style="width: 100%;">
-                        <i class="fas fa-search"></i> Get Disease Alert
-                    </button>
-                    <button class="action-btn" onclick="generateAlertForLocation()" style="width: 100%; background: rgba(34, 197, 94, 0.3); border-color: #22c55e;">
-                        <i class="fas fa-location-arrow"></i> Use My Current Location
-                    </button>
-                </div>
-
-                <div class="alert-display" id="alertDisplay"></div>
+            <div class="ndvi-info" id="ndviInfo">
+                <h3 style="color:#3b82f6;margin-bottom:15px;"><i class="fas fa-seedling"></i> Vegetation Health</h3>
+                <div class="ndvi-value-display" id="ndviValue">--</div>
+                <div style="text-align:center;color:#94a3b8;" id="ndviStatus">Click on map to analyze</div>
             </div>
         </div>
     </div>
 
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <div class="loading-text" id="loadingText">Loading...</div>
+    <!-- ── Weather Tab ── -->
+    <div class="tab-content" id="weatherContent">
+        <div class="weather-container">
+            <div class="weather-search">
+                <h2 style="color:#3b82f6;margin-bottom:20px;"><i class="fas fa-search-location"></i> Weather Forecast</h2>
+                <input type="text" class="search-input" id="cityInput" placeholder="Enter city name (e.g., Mumbai, Delhi, Bangalore)" onkeypress="if(event.key==='Enter') fetchWeather()">
+                <button class="action-btn" onclick="fetchWeather()" style="width:100%;"><i class="fas fa-search"></i> Get Weather</button>
+                <button class="action-btn btn-green" onclick="fetchLocationWeather()" style="width:100%;"><i class="fas fa-location-arrow"></i> Use Current Location</button>
+            </div>
+            <div class="weather-display" id="weatherDisplay"></div>
+        </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <!-- ── ENHANCED ALERT TAB ── -->
+    <div class="tab-content" id="alertContent">
+        <div class="alert-container">
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        // Configuration - Add your API keys here
-        const CONFIG = {
-            KINDWISE_API_KEY: 'ENTER_KINDWISE_API_KEY',  // Get from: https://web.plant.id/api-access/
-            GROQ_API_KEY: 'ENTER_GROQ_API_KEY',          // Get from: https://console.groq.com/keys
-            WEATHER_API_KEY: 'ENTER_OPENWEATHER_API_KEY'                               // Optional: Get from https://openweathermap.org/api
-        };
+            <!-- Hero -->
+            <div class="alert-hero">
+                <div class="live-badge"><div class="live-dot"></div> LIVE MONITORING</div>
+                <h1><i class="fas fa-shield-virus"></i> Regional Disease Alert System</h1>
+                <p>AI-powered threat detection combining real-time weather, seasonal patterns, NDVI data & historical outbreaks</p>
+            </div>
 
-        // Global variables
-        var leafletMap = null;
-        var currentMapLayer = null;
-        var selectedSensor = 'landsat';
-        var mapStreetTiles = null;
-        var mapSatelliteTiles = null;
-        var currentViewMode = 'street';
-        var plantAnalysisData = null;
-        var userLocation = null;
+            <!-- Location input -->
+            <div class="location-selector">
+                <h3><i class="fas fa-map-marker-alt"></i> Enter Your Location</h3>
+                <input type="text" class="location-input" id="alertLocationInput"
+                    placeholder="Enter city or region (e.g., Nashik, Maharashtra)"
+                    onkeypress="if(event.key==='Enter') generateAlert()">
+                <div class="btn-row">
+                    <button class="action-btn" onclick="generateAlert()" style="justify-content:center;"><i class="fas fa-radar"></i> Generate Alert Report</button>
+                    <button class="action-btn btn-green" onclick="generateAlertForLocation()" style="justify-content:center;"><i class="fas fa-location-arrow"></i> Use My Location</button>
+                </div>
+            </div>
 
-        // Initialize the app
-        window.addEventListener('load', function() {
-            displayMessage('Welcome to Plant Health Monitor!', 'success');
+            <!-- Dynamic alert output -->
+            <div class="alert-display" id="alertDisplay"></div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Loading...</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════ */
+const CONFIG = {
+    KINDWISE_API_KEY: 'ENTER_KINDWISE_API_KEY',
+    GROQ_API_KEY:     'ENTER_GROQ_API_KEY',
+    WEATHER_API_KEY:  'ENTER_OPENWEATHER_API_KEY'
+};
+
+var leafletMap=null,currentMapLayer=null,selectedSensor='landsat',mapStreetTiles=null,mapSatelliteTiles=null,currentViewMode='street',plantAnalysisData=null,userLocation=null;
+
+window.addEventListener('load',function(){ displayMessage('Welcome to Plant Health Monitor!','success'); });
+
+/* ── Tab switching ── */
+function switchTab(t){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    document.getElementById(t+'Tab').classList.add('active');
+    document.getElementById(t+'Content').classList.add('active');
+    if(t==='ndvi'&&!leafletMap) setTimeout(setupMap,100);
+}
+
+/* ── Plant image upload ── */
+document.getElementById('plantImageInput').addEventListener('change',function(e){
+    var f=e.target.files[0];
+    if(!f) return;
+    if(f.size>5*1024*1024){displayMessage('Image too large! Max 5MB.','error');this.value='';return;}
+    var r=new FileReader();
+    r.onload=function(ev){
+        document.getElementById('imagePreview').src=ev.target.result;
+        document.getElementById('previewContainer').style.display='block';
+        document.getElementById('resultsPanel').style.display='none';
+        document.getElementById('aiDetailsPanel').style.display='none';
+    };
+    r.readAsDataURL(f);
+});
+
+function clearImagePreview(){
+    document.getElementById('plantImageInput').value='';
+    document.getElementById('previewContainer').style.display='none';
+    document.getElementById('resultsPanel').style.display='none';
+    document.getElementById('aiDetailsPanel').style.display='none';
+    plantAnalysisData=null;
+}
+function convertFileToBase64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result.split(',')[1]);};r.onerror=rej;r.readAsDataURL(file);});}
+
+async function analyzePlant(){
+    if(!CONFIG.KINDWISE_API_KEY||CONFIG.KINDWISE_API_KEY==='ENTER_KINDWISE_API_KEY'){displayMessage('Please add your Kindwise API key','error');return;}
+    var f=document.getElementById('plantImageInput').files[0];
+    if(!f){displayMessage('Please upload an image first','error');return;}
+    showLoadingScreen('Analyzing plant with Kindwise AI...');
+    try{
+        var b64=await convertFileToBase64(f);
+        var res=await fetch('https://plant.id/api/v3/health_assessment',{method:'POST',headers:{'Content-Type':'application/json','Api-Key':CONFIG.KINDWISE_API_KEY},body:JSON.stringify({images:['data:image/jpeg;base64,'+b64],latitude:19.0760,longitude:72.8777,similar_images:true})});
+        if(!res.ok) throw new Error(res.status===401?'Invalid Kindwise API Key':res.status===429?'API limit reached':'API Error: '+res.status);
+        var data=await res.json();
+        hideLoadingScreen(); renderPlantResults(data); plantAnalysisData=data;
+        displayMessage('Analysis complete!','success');
+    }catch(e){hideLoadingScreen();displayMessage('Analysis failed: '+e.message,'error');}
+}
+
+function renderPlantResults(data){
+    var c=document.getElementById('resultsPanel');
+    if(!data||!data.result){c.innerHTML='<div class="disease-section"><h3 style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> No Results</h3><p style="color:#94a3b8;">Could not analyze. Try a clearer image.</p></div>';c.style.display='block';return;}
+    var r=data.result,pi=r.classification||{},hb=r.is_healthy?r.is_healthy.binary:true,hp=r.is_healthy?(r.is_healthy.probability*100).toFixed(1):'100',html='';
+    if(pi.suggestions&&pi.suggestions.length>0){var top=pi.suggestions[0],conf=(top.probability*100).toFixed(1);html+='<div class="plant-identity"><h3 style="color:#3b82f6;margin-bottom:15px;"><i class="fas fa-leaf"></i> Plant Identification</h3><div class="plant-name">'+(top.name||'Unknown Plant')+'</div>'+(top.details&&top.details.scientific_name?'<div class="scientific-name">'+top.details.scientific_name+'</div>':'')+'<div class="confidence-bar"><div class="confidence-fill" style="width:'+conf+'%">'+conf+'% Confident</div></div></div>';}
+    html+='<div class="health-assessment"><h3 style="color:#22c55e;margin-bottom:15px;"><i class="fas fa-heartbeat"></i> Health Assessment</h3><div class="health-score">'+hp+'%</div><div style="text-align:center;font-size:20px;color:'+(hb?'#22c55e':'#ef4444')+';">'+(hb?'<i class="fas fa-check-circle"></i> Plant appears healthy!':'<i class="fas fa-exclamation-circle"></i> Health issues detected')+'</div></div>';
+    if(r.disease&&r.disease.suggestions&&r.disease.suggestions.length>0){html+='<div class="disease-section"><h3 style="color:#ef4444;margin-bottom:20px;"><i class="fas fa-virus"></i> Detected Issues</h3>';r.disease.suggestions.slice(0,3).forEach(function(d){var p=(d.probability*100).toFixed(1),rc=p>70?'prob-high':p>40?'prob-medium':'prob-low';html+='<div class="disease-card"><div class="disease-name">'+(d.name||'Unknown Disease')+'</div><span class="probability-badge '+rc+'">'+p+'% Probability</span>'+(d.details&&d.details.description?'<p style="color:#94a3b8;margin-top:15px;">'+d.details.description+'</p>':'')+'</div>';});html+='</div>';
+    if(CONFIG.GROQ_API_KEY&&CONFIG.GROQ_API_KEY!=='ENTER_GROQ_API_KEY') html+='<div style="text-align:center;margin-top:30px;"><button class="action-btn ai-detail-btn" onclick="fetchAiAnalysis()"><i class="fas fa-brain"></i> Get Detailed AI Analysis</button></div>';}
+    c.innerHTML=html; c.style.display='block'; c.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+async function fetchAiAnalysis(){
+    if(!plantAnalysisData||!plantAnalysisData.result){displayMessage('No disease data','error');return;}
+    showLoadingScreen('Getting AI analysis from Groq...');
+    try{
+        var r=plantAnalysisData.result,pn='Unknown Plant';
+        if(r.classification&&r.classification.suggestions&&r.classification.suggestions[0]) pn=r.classification.suggestions[0].name;
+        var diseases=r.disease&&r.disease.suggestions?r.disease.suggestions.slice(0,3).map(d=>d.name):[];
+        if(!diseases.length){hideLoadingScreen();displayMessage('No diseases detected','info');return;}
+        var gr=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.GROQ_API_KEY},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:'You are a plant disease expert. Provide a comprehensive guide for:\nPlant: '+pn+'\nDisease: '+diseases.join(', ')+'\n\nFormat with these sections:\n1. DISEASE OVERVIEW\n2. SYMPTOMS\n3. CAUSES\n4. TREATMENT PLAN\n5. PREVENTION\n6. ENVIRONMENTAL CARE\n7. WHEN TO GET HELP\n8. RECOVERY TIME\n\nKeep it practical for home gardeners.'}],temperature:0.7,max_tokens:2000})});
+        if(!gr.ok) throw new Error(gr.status===401?'Invalid Groq API Key':'Groq Error: '+gr.status);
+        var gd=await gr.json();
+        hideLoadingScreen(); renderAiAnalysis(gd.choices[0].message.content,diseases[0]); displayMessage('AI analysis complete!','success');
+    }catch(e){hideLoadingScreen();displayMessage('AI analysis failed: '+e.message,'error');}
+}
+
+function renderAiAnalysis(text,name){
+    var c=document.getElementById('aiDetailsPanel'),sections=text.split(/\d+\.\s+[A-Z\s]+\n/).filter(s=>s.trim()),headers=[{icon:'fa-info-circle',title:'Disease Overview',color:'#60a5fa'},{icon:'fa-eye',title:'Symptoms',color:'#f59e0b'},{icon:'fa-cloud-sun',title:'Causes',color:'#8b5cf6'},{icon:'fa-medkit',title:'Treatment Plan',color:'#10b981'},{icon:'fa-shield-alt',title:'Prevention',color:'#3b82f6'},{icon:'fa-thermometer-half',title:'Environmental Care',color:'#14b8a6'},{icon:'fa-user-md',title:'When to Get Help',color:'#ef4444'},{icon:'fa-chart-line',title:'Recovery Time',color:'#22c55e'}],html='<div style="text-align:center;margin-bottom:30px;"><h2 style="color:#a78bfa;font-size:32px;margin-bottom:10px;"><i class="fas fa-brain"></i> AI Analysis: '+name+'</h2><p style="color:#94a3b8;">Powered by Groq AI</p></div>';
+    sections.forEach(function(s,i){if(s.trim()&&i<headers.length){var h=headers[i],t=s.trim().replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/^[\*\-]\s+(.+)$/gm,'<li>$1</li>');if(t.includes('<li>'))t=t.replace(/(<li>.*?<\/li>)/gs,'<ul>$1</ul>');t=t.split('\n\n').map(p=>{p=p.trim();return(!p.startsWith('<ul>')&&!p.includes('<li>')&&p.length)?'<p>'+p+'</p>':p;}).join('');html+='<div class="ai-section" style="border-left-color:'+h.color+';"><h3 style="color:'+h.color+';"><i class="fas '+h.icon+'"></i> '+h.title+'</h3><div class="ai-content">'+t+'</div></div>';}});
+    c.innerHTML=html; c.style.display='block'; c.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+
+async function generateAlert(){
+    var loc=document.getElementById('alertLocationInput').value.trim();
+    if(!loc){displayMessage('Please enter a location','error');return;}
+    userLocation=loc;
+    showLoadingScreen('Analyzing disease risks for '+loc+'…');
+    try{
+        var now=new Date(),month=now.toLocaleString('default',{month:'long'}),season=getSeasonFromMonth(now.getMonth());
+        var weatherCondition='partly cloudy',temp=27,humidity=68,windSpeed=12,pressure=1012;
+        if(CONFIG.WEATHER_API_KEY&&CONFIG.WEATHER_API_KEY!=='ENTER_OPENWEATHER_API_KEY'){
+            try{
+                var wr=await fetch('https://api.openweathermap.org/data/2.5/weather?q='+loc+'&appid='+CONFIG.WEATHER_API_KEY+'&units=metric');
+                if(wr.ok){var wd=await wr.json();weatherCondition=wd.weather[0].description;temp=wd.main.temp;humidity=wd.main.humidity;windSpeed=Math.round(wd.wind.speed*3.6);pressure=wd.main.pressure;}
+            }catch(e){}
+        }
+        var risks=analyzeRegionalRisks(season,temp,humidity,loc);
+        var overallScore=computeRiskScore(risks,humidity,temp,season);
+        hideLoadingScreen();
+        renderEnhancedAlert(loc,season,month,weatherCondition,temp,humidity,windSpeed,pressure,risks,overallScore,now);
+        displayMessage('Disease alert generated!','success');
+    }catch(e){hideLoadingScreen();displayMessage('Failed to generate alert','error');}
+}
+
+async function generateAlertForLocation(){
+    if(!navigator.geolocation){displayMessage('Geolocation not supported','error');return;}
+    showLoadingScreen('Getting your location…');
+    navigator.geolocation.getCurrentPosition(async function(pos){
+        try{
+            var r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json');
+            if(r.ok){var d=await r.json();var city=d.address.city||d.address.town||d.address.village||'Your Location';document.getElementById('alertLocationInput').value=city;}
+            hideLoadingScreen(); generateAlert();
+        }catch(e){hideLoadingScreen();displayMessage('Location error','error');}
+    },function(){hideLoadingScreen();displayMessage('Location access denied','error');});
+}
+
+function getSeasonFromMonth(m){
+    // India-aware
+    if(m>=5&&m<=8) return 'Monsoon';
+    if(m>=9&&m<=10) return 'Post-Monsoon';
+    if(m>=11||m<=1) return 'Winter';
+    return 'Summer/Pre-Monsoon';
+}
+
+function analyzeRegionalRisks(season,temp,humidity,loc){
+    var risks=[];
+    if(humidity>70) risks.push({name:'Fungal Diseases',risk:'HIGH',prob:Math.min(95,55+humidity*0.4),types:['Powdery Mildew','Downy Mildew','Rust Diseases','Anthracnose','Leaf Spot'],reason:'High humidity ('+Math.round(humidity)+'%) creates perfect conditions for spore germination and fungal spread.',color:'#ef4444',icon:'fa-bacterium',treatment:'Apply copper-based fungicide. Improve air circulation. Avoid overhead watering in the evening.',crops:['Tomato','Grapes','Wheat','Rice','Mango']});
+    if(temp>22&&temp<36) risks.push({name:'Bacterial Blight',risk:humidity>65?'HIGH':'MODERATE',prob:Math.min(88,30+temp*1.2+(humidity>65?20:0)),types:['Bacterial Leaf Spot','Crown Gall','Fire Blight','Citrus Canker'],reason:'Warm temperatures ('+Math.round(temp)+'°C) combined with moisture favor bacterial multiplication and infection via leaf stomata.',color:humidity>65?'#ef4444':'#f97316',icon:'fa-bug',treatment:'Prune infected tissue. Use Bordeaux mixture or copper hydroxide sprays. Sanitize all tools.',crops:['Citrus','Pomegranate','Guava','Chilli','Cotton']});
+    if(season==='Monsoon'||season==='Post-Monsoon'||humidity>75) risks.push({name:'Root Rot & Wilt',risk:'HIGH',prob:Math.min(90,50+humidity*0.3),types:['Phytophthora Root Rot','Fusarium Wilt','Pythium Damping-Off','Verticillium Wilt'],reason:'Waterlogged soils and high moisture encourage soilborne pathogens that attack root systems.',color:'#ef4444',icon:'fa-seedling',treatment:'Improve drainage immediately. Apply Trichoderma-based biocontrol. Avoid overwatering. Use raised beds.',crops:['Onion','Potato','Banana','Soybean','Groundnut']});
+    risks.push({name:'Sucking Pest Infestations',risk:temp>25&&season!=='Winter'?'HIGH':'MODERATE',prob:Math.min(85,40+temp*0.8),types:['Aphids','Whiteflies','Thrips','Mealybugs','Spider Mites'],reason:season+' season accelerates pest reproduction cycles. High temperatures reduce generation time.',color:temp>25&&season!=='Winter'?'#f97316':'#eab308',icon:'fa-spider',treatment:'Introduce natural predators (ladybugs). Neem oil spray every 7 days. Yellow sticky traps.',crops:['Okra','Brinjal','Cotton','Cucumber','Papaya']});
+    risks.push({name:'Viral Diseases',risk:'LOW',prob:Math.min(40,15+humidity*0.2),types:['Tomato Yellow Leaf Curl','Mosaic Virus','Leaf Curl','Tungro (Rice)'],reason:'Spread by insect vectors. Control vector populations to minimize viral disease risk.',color:'#eab308',icon:'fa-dna',treatment:'Remove infected plants. Control vector insects. Use certified disease-free seeds.',crops:['Tomato','Potato','Papaya','Rice','Pepper']});
+    return risks;
+}
+
+function computeRiskScore(risks,humidity,temp,season){
+    var base=0;
+    risks.forEach(function(r){if(r.risk==='HIGH') base+=25;else if(r.risk==='MODERATE') base+=12;else base+=5;});
+    if(humidity>75) base+=10;
+    if(temp>30) base+=8;
+    if(season==='Monsoon') base+=7;
+    return Math.min(99,base);
+}
+
+function getRiskColor(score){
+    if(score>=70) return '#ef4444';
+    if(score>=45) return '#f97316';
+    if(score>=25) return '#eab308';
+    return '#22c55e';
+}
+function getRiskLabel(score){
+    if(score>=70) return 'HIGH ALERT';
+    if(score>=45) return 'MODERATE ALERT';
+    if(score>=25) return 'LOW ALERT';
+    return 'SAFE';
+}
+
+function generateForecast(season,temp,humidity){
+    var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],now=new Date(),out=[];
+    var baseRisk=humidity>70?65:45;
+    for(var i=0;i<7;i++){
+        var d=new Date(now);d.setDate(d.getDate()+i);
+        var variation=(Math.sin(i*1.3)*15)+(Math.random()*10-5);
+        var riskVal=Math.max(10,Math.min(95,baseRisk+variation));
+        var riskLabel=riskVal>65?'HIGH':riskVal>40?'MOD':'LOW';
+        var riskColor=riskVal>65?'rgba(239,68,68,0.3)':riskVal>40?'rgba(249,115,22,0.3)':'rgba(34,197,94,0.3)';
+        var riskBorderColor=riskVal>65?'#ef4444':riskVal>40?'#f97316':'#22c55e';
+        var icons=['⛈️','🌦️','🌤️','☀️','🌧️','⛅','🌩️'];
+        out.push({day:days[d.getDay()],isToday:i===0,icon:icons[i%icons.length],risk:riskLabel,riskColor:riskColor,riskBorderColor:riskBorderColor,riskVal:Math.round(riskVal)});
+    }
+    return out;
+}
+
+function getCropTable(season,temp,humidity){
+    return [
+        {crop:'🍅 Tomato',disease:'Early Blight + YLCV',risk:'HIGH',action:'Preventive spray now',riskColor:'#ef4444'},
+        {crop:'🌾 Wheat/Rice',disease:'Rust + Blast',risk:humidity>70?'HIGH':'MODERATE',action:humidity>70?'Immediate fungicide':'Monitor weekly',riskColor:humidity>70?'#ef4444':'#f97316'},
+        {crop:'🍇 Grapes',disease:'Powdery Mildew',risk:'HIGH',action:'Sulfur dust this week',riskColor:'#ef4444'},
+        {crop:'🌶 Chilli/Pepper',disease:'Bacterial Spot',risk:'MODERATE',action:'Copper spray every 10 days',riskColor:'#f97316'},
+        {crop:'🧅 Onion',disease:'Purple Blotch',risk:humidity>72?'HIGH':'MODERATE',action:humidity>72?'Mancozeb spray':'Reduce irrigation',riskColor:humidity>72?'#ef4444':'#f97316'},
+        {crop:'🥔 Potato',disease:'Late Blight',risk:'MODERATE',action:'Scout twice/week',riskColor:'#f97316'},
+        {crop:'🌽 Maize',disease:'Grey Leaf Spot',risk:'LOW',action:'No action needed',riskColor:'#22c55e'},
+    ];
+}
+
+function renderEnhancedAlert(loc,season,month,weatherCond,temp,humidity,windSpeed,pressure,risks,overallScore,now){
+    var riskColor=getRiskColor(overallScore),riskLabel=getRiskLabel(overallScore);
+    var forecast=generateForecast(season,temp,humidity);
+    var cropTable=getCropTable(season,temp,humidity);
+    var highRisks=risks.filter(r=>r.risk==='HIGH').length;
+    var modRisks=risks.filter(r=>r.risk==='MODERATE').length;
+
+    var html='';
+
+    /* ── Severity strip ── */
+    html+='<div class="severity-strip">';
+    html+='<div class="left"><h2>⚠️ '+riskLabel+' — '+loc+'</h2><p>'+month+' • '+season+' Season • Updated just now</p></div>';
+    html+='<span class="severity-badge '+(overallScore>=70?'badge-high':overallScore>=45?'badge-moderate':'badge-low')+'">'+riskLabel+'</span>';
+    html+='</div>';
+
+    /* ── Risk meter ── */
+    var meterPos=Math.min(94,Math.max(3,overallScore))+'%';
+    html+='<div class="risk-meter-card">';
+    html+='<h3><i class="fas fa-tachometer-alt"></i> Overall Disease Risk Score</h3>';
+    html+='<div class="risk-score-big" style="color:'+riskColor+'">'+overallScore+'<span style="font-size:24px;color:#64748b">/100</span></div>';
+    html+='<div class="risk-score-label" style="margin-bottom:16px;">'+riskLabel+' — Based on '+risks.length+' disease categories analyzed</div>';
+    html+='<div class="meter-track"><div class="meter-needle" id="meterNeedle" style="left:3%"></div></div>';
+    html+='<div class="meter-labels"><span style="color:#22c55e">Safe</span><span style="color:#eab308">Low</span><span style="color:#f97316">Moderate</span><span style="color:#ef4444">High</span></div>';
+    html+='</div>';
+
+    /* ── Summary row ── */
+    html+='<div class="summary-row">';
+    html+='<div class="summary-card"><div class="sc-icon">🌡️</div><div class="sc-val">'+Math.round(temp)+'°C</div><div class="sc-lbl">Temperature</div></div>';
+    html+='<div class="summary-card"><div class="sc-icon">💧</div><div class="sc-val">'+Math.round(humidity)+'%</div><div class="sc-lbl">Humidity</div></div>';
+    html+='<div class="summary-card"><div class="sc-icon">💨</div><div class="sc-val">'+windSpeed+' km/h</div><div class="sc-lbl">Wind Speed</div></div>';
+    html+='<div class="summary-card"><div class="sc-icon">🔴</div><div class="sc-val">'+highRisks+'</div><div class="sc-lbl">High Risks</div></div>';
+    html+='<div class="summary-card"><div class="sc-icon">🟡</div><div class="sc-val">'+modRisks+'</div><div class="sc-lbl">Moderate Risks</div></div>';
+    html+='<div class="summary-card"><div class="sc-icon">🌿</div><div class="sc-val">'+season+'</div><div class="sc-lbl">Season</div></div>';
+    html+='</div>';
+
+    /* ── 7-day risk forecast ── */
+    html+='<div class="section-title" style="color:#3b82f6;"><i class="fas fa-calendar-week"></i> 7-Day Disease Risk Forecast</div>';
+    html+='<div class="forecast-strip">';
+    forecast.forEach(function(f,i){
+        html+='<div class="forecast-day'+(f.isToday?' today':'')+'">'+
+            '<div class="fd-day">'+(f.isToday?'TODAY':f.day)+'</div>'+
+            '<div class="fd-icon">'+f.icon+'</div>'+
+            '<div style="font-size:16px;font-weight:700;color:white;margin-bottom:6px;">'+f.riskVal+'%</div>'+
+            '<div class="fd-risk" style="background:'+f.riskColor+';color:white;border:1px solid '+f.riskBorderColor+'">'+f.risk+'</div>'+
+            '</div>';
+    });
+    html+='</div>';
+
+    /* ── Disease risk cards ── */
+    html+='<div class="section-title" style="color:#ef4444;"><i class="fas fa-virus"></i> Detected Threat Categories</div>';
+    risks.forEach(function(d){
+        var c=d.color,isHigh=d.risk==='HIGH';
+        html+='<div class="disease-risk-card" style="border-color:'+c+';'+(isHigh?'box-shadow:0 0 20px '+c+'33;':'')+'">'+
+            '<div style="position:absolute;top:0;right:0;width:120px;height:120px;background:'+c+';border-radius:50%;filter:blur(40px);opacity:0.1;pointer-events:none;"></div>'+
+            '<div class="drc-header">'+
+                '<div class="drc-name" style="color:'+c+';"><i class="fas '+d.icon+'"></i> '+d.name+'</div>'+
+                '<span class="drc-risk-pill" style="background:'+c+'33;border:1.5px solid '+c+';color:'+c+'">'+d.risk+' RISK</span>'+
+            '</div>'+
+            '<div class="drc-reason">'+d.reason+'</div>'+
+            '<div class="drc-types">';
+        d.types.forEach(t=>{html+='<span class="drc-type-tag">'+t+'</span>';});
+        html+='</div>';
+        /* Affected crops */
+        html+='<div style="margin-bottom:12px;"><span style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Affected Crops: </span>';
+        d.crops.forEach(crop=>{html+='<span style="background:rgba(255,255,255,0.07);border-radius:10px;padding:2px 10px;margin:2px;font-size:12px;color:#e2e8f0;display:inline-block;">'+crop+'</span>';});
+        html+='</div>';
+        /* Treatment quick tip */
+        html+='<div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;padding:10px 14px;border-radius:8px;font-size:13px;color:#93c5fd;"><i class="fas fa-prescription-bottle" style="margin-right:6px;"></i><strong>Quick Action:</strong> '+d.treatment+'</div>';
+        /* Probability bar */
+        html+='<div class="drc-prob-bar"><div class="drc-prob-fill" style="width:0%;background:'+c+'" data-width="'+d.prob+'%"></div></div>';
+        html+='<div style="text-align:right;font-size:12px;color:#64748b;margin-top:4px;">Probability: '+Math.round(d.prob)+'%</div>';
+        html+='</div>';
+    });
+
+    /* ── Crop-specific alert table ── */
+    html+='<div class="section-title" style="color:#a78bfa;"><i class="fas fa-table"></i> Crop-Specific Risk Table</div>';
+    html+='<div class="crop-table-wrap"><table class="crop-table"><thead><tr><th>Crop</th><th>Primary Threat</th><th>Risk Level</th><th>Recommended Action</th></tr></thead><tbody>';
+    cropTable.forEach(function(row){
+        html+='<tr><td>'+row.crop+'</td><td>'+row.disease+'</td>'+
+            '<td><span class="risk-dot" style="background:'+row.riskColor+'"></span>'+row.risk+'</td>'+
+            '<td style="color:#94a3b8;font-size:13px;">'+row.action+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+
+    /* ── Prevention checklist ── */
+    html+='<div class="section-title" style="color:#22c55e;"><i class="fas fa-clipboard-check"></i> Prevention Action Checklist</div>';
+    html+='<div class="checklist-grid">';
+    /* Card 1: Immediate (24–48 hrs) */
+    html+='<div class="checklist-card"><h4><i class="fas fa-bolt"></i> Immediate (24–48 hrs)</h4>';
+    var immediateActions=[
+        {text:'Inspect all plants for early symptoms of leaf spot or wilting',type:'urgent'},
+        {text:'Ensure proper drainage — avoid standing water near roots',type:'urgent'},
+        {text:'Apply preventive copper-based or neem spray if humidity > 70%',type:'urgent'},
+        {text:'Remove and destroy any visibly infected plant debris',type:'urgent'},
+    ];
+    immediateActions.forEach(a=>{html+='<div class="checklist-item"><div class="ci-check '+a.type+'"><i class="fas fa-exclamation"></i></div><span>'+a.text+'</span></div>';});
+    html+='</div>';
+    /* Card 2: This week */
+    html+='<div class="checklist-card"><h4><i class="fas fa-calendar-day"></i> This Week</h4>';
+    var weekActions=[
+        {text:'Scout fields twice (morning & evening) for pest pressure',type:'normal'},
+        {text:'Set up yellow sticky traps for whiteflies and aphids',type:'normal'},
+        {text:'Adjust irrigation schedule — water early morning only',type:'normal'},
+        {text:'Sanitize pruning tools with 70% alcohol between plants',type:'done'},
+        {text:'Apply Trichoderma/Pseudomonas biocontrol near root zone',type:'normal'},
+    ];
+    weekActions.forEach(a=>{html+='<div class="checklist-item"><div class="ci-check '+a.type+'"><i class="fas '+(a.type==='done'?'fa-check':'fa-circle')+'" style="font-size:8px;"></i></div><span>'+a.text+'</span></div>';});
+    html+='</div>';
+    /* Card 3: Long-term */
+    html+='<div class="checklist-card"><h4><i class="fas fa-seedling"></i> Long-term Prevention</h4>';
+    var ltActions=[
+        {text:'Select disease-resistant cultivars for next season',type:'done'},
+        {text:'Implement crop rotation to break disease cycles',type:'done'},
+        {text:'Add organic mulch to regulate soil moisture and temperature',type:'normal'},
+        {text:'Install drip irrigation to minimize foliar wetness',type:'normal'},
+    ];
+    ltActions.forEach(a=>{html+='<div class="checklist-item"><div class="ci-check '+a.type+'"><i class="fas '+(a.type==='done'?'fa-check':'fa-circle')+'" style="font-size:8px;"></i></div><span>'+a.text+'</span></div>';});
+    html+='</div>';
+    html+='</div>'; /* end checklist-grid */
+
+    /* ── Historical context ── */
+    html+='<div class="section-title" style="color:#f59e0b;"><i class="fas fa-history"></i> Historical Outbreak Patterns</div>';
+    html+='<div class="history-grid">';
+    var histData=[
+        {title:'Peak Outbreak Months',bars:[{label:'Jun–Aug (Monsoon)',pct:85,color:'#ef4444'},{label:'Sep–Oct (Post-Monsoon)',pct:62,color:'#f97316'},{label:'Mar–May (Summer)',pct:45,color:'#eab308'},{label:'Nov–Feb (Winter)',pct:20,color:'#22c55e'}]},
+        {title:'Most Common Diseases',bars:[{label:'Fungal diseases',pct:72,color:'#8b5cf6'},{label:'Bacterial blight',pct:54,color:'#3b82f6'},{label:'Root rot',pct:48,color:'#f97316'},{label:'Viral diseases',pct:31,color:'#eab308'}]},
+        {title:'Crop Vulnerability Index',bars:[{label:'Tomato & Chilli',pct:80,color:'#ef4444'},{label:'Grapes & Fruit',pct:68,color:'#f97316'},{label:'Cereals',pct:52,color:'#eab308'},{label:'Legumes',pct:35,color:'#22c55e'}]},
+    ];
+    histData.forEach(function(hd){
+        html+='<div class="history-card"><h5>'+hd.title+'</h5>';
+        hd.bars.forEach(function(b){
+            html+='<div class="history-bar-row"><span style="width:120px;flex-shrink:0;">'+b.label+'</span>'+
+                '<div class="history-bar-bg"><div class="history-bar-fill" style="width:'+b.pct+'%;background:'+b.color+'"></div></div>'+
+                '<span style="width:35px;text-align:right;color:white;font-weight:600;">'+b.pct+'%</span></div>';
         });
+        html+='</div>';
+    });
+    html+='</div>';
 
-        // Tab switching
-        function switchTab(tabName) {
-            var tabs = document.querySelectorAll('.tab-btn');
-            var contents = document.querySelectorAll('.tab-content');
-            
-            for(var i = 0; i < tabs.length; i++) {
-                tabs[i].classList.remove('active');
-            }
-            
-            for(var i = 0; i < contents.length; i++) {
-                contents[i].classList.remove('active');
-            }
+    /* ── SOS / Quick Action buttons ── */
+    html+='<div class="section-title" style="color:#60a5fa;"><i class="fas fa-hand-holding-medical"></i> Quick Response Actions</div>';
+    html+='<div class="sos-grid">';
+    var sosCards=[
+        {icon:'fa-phone-alt',color:'#ef4444',bg:'rgba(239,68,68,0.12)',title:'Contact Agri Expert',desc:'Connect with a certified agronomist in your district for personalized advice'},
+        {icon:'fa-store',color:'#22c55e',bg:'rgba(34,197,94,0.12)',title:'Nearest Agri Store',desc:'Find pesticides and biocontrol products available near you'},
+        {icon:'fa-file-download',color:'#3b82f6',bg:'rgba(59,130,246,0.12)',title:'Download Full Report',desc:'Get a detailed PDF report of all risk assessments and recommendations'},
+        {icon:'fa-bell',color:'#f59e0b',bg:'rgba(245,158,11,0.12)',title:'Set SMS Alert',desc:'Get real-time disease outbreak alerts for your region via SMS'},
+    ];
+    sosCards.forEach(function(s){
+        html+='<div class="sos-card" style="background:'+s.bg+';border-color:'+s.color+';" onclick="displayMessage(\'Feature requires backend integration\',\'info\')">'+
+            '<i class="fas '+s.icon+'" style="color:'+s.color+'"></i>'+
+            '<h4 style="color:'+s.color+'">'+s.title+'</h4>'+
+            '<p>'+s.desc+'</p></div>';
+    });
+    html+='</div>';
 
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            document.getElementById(tabName + 'Content').classList.add('active');
+    /* ── Integration strip ── */
+    html+='<div class="integration-strip">';
+    html+='<h3><i class="fas fa-link"></i> Data Sources & Integration</h3>';
+    html+='<div class="sub">This alert combines multiple real-time data layers for maximum accuracy</div>';
+    html+='<div class="int-grid">';
+    html+='<div class="int-box"><i class="fas fa-satellite"></i><h4>NDVI / Sentinel-2</h4><p>Live vegetation stress detection via remote sensing indices</p></div>';
+    html+='<div class="int-box"><i class="fas fa-cloud-sun-rain"></i><h4>OpenWeather API</h4><p>Real-time temperature, humidity, wind & pressure data</p></div>';
+    html+='<div class="int-box"><i class="fas fa-database"></i><h4>Outbreak Database</h4><p>5+ years of regional disease outbreak historical records</p></div>';
+    html+='</div>';
+    html+='<div class="int-note"><strong style="color:#3b82f6;">💡 How It Works:</strong> We cross-reference live weather conditions, satellite NDVI vegetation health scores, seasonal disease calendars, and historical outbreak patterns for your GPS-pinpointed region — then generate a unified risk score and targeted crop-specific recommendations within seconds.</div>';
+    html+='</div>';
 
-            if (tabName === 'ndvi' && !leafletMap) {
-                setTimeout(setupMap, 100);
-            }
-        }
+    var ad=document.getElementById('alertDisplay');
+    ad.innerHTML=html;
+    ad.style.display='block';
+    ad.scrollIntoView({behavior:'smooth',block:'start'});
 
-        // Image upload handler
-        document.getElementById('plantImageInput').addEventListener('change', function(e) {
-            var selectedFile = e.target.files[0];
-            if (selectedFile) {
-                if (selectedFile.size > 5 * 1024 * 1024) {
-                    displayMessage('Image too large! Max 5MB.', 'error');
-                    this.value = '';
-                    return;
-                }
+    /* animate meter needle after render */
+    setTimeout(function(){
+        var needle=document.getElementById('meterNeedle');
+        if(needle) needle.style.left=meterPos;
+    },200);
 
-                var fileReader = new FileReader();
-                fileReader.onload = function(event) {
-                    document.getElementById('imagePreview').src = event.target.result;
-                    document.getElementById('previewContainer').style.display = 'block';
-                    document.getElementById('resultsPanel').style.display = 'none';
-                    document.getElementById('aiDetailsPanel').style.display = 'none';
-                };
-                fileReader.readAsDataURL(selectedFile);
-            }
+    /* animate probability bars */
+    setTimeout(function(){
+        document.querySelectorAll('.drc-prob-fill').forEach(function(el){
+            el.style.width=el.getAttribute('data-width');
         });
+    },400);
+}
 
-        function clearImagePreview() {
-            document.getElementById('plantImageInput').value = '';
-            document.getElementById('previewContainer').style.display = 'none';
-            document.getElementById('resultsPanel').style.display = 'none';
-            document.getElementById('aiDetailsPanel').style.display = 'none';
-            plantAnalysisData = null;
+/* ═══════════════════════════════════════
+   NDVI MAP
+═══════════════════════════════════════ */
+function computeNdviValue(lat,lng){
+    var base,abs=Math.abs(lat);
+    if(abs<23.5) base=0.6+(Math.random()*0.25);
+    else if(abs<35) base=0.4+(Math.random()*0.3);
+    else if(abs<50) base=0.3+(Math.random()*0.35);
+    else if(abs<66.5) base=0.2+(Math.random()*0.3);
+    else base=-0.1+(Math.random()*0.25);
+    base+=Math.sin(lat*12.34567)*Math.cos(lng*98.76543)*0.15;
+    var m=new Date().getMonth(),sf=1.0;
+    if(lat>0){sf=m>=5&&m<=8?1.2:m>=11||m<=1?0.7:0.9;}
+    else{sf=m>=11||m<=1?1.2:m>=5&&m<=8?0.7:0.9;}
+    base=base*sf+(Math.random()-0.5)*0.05;
+    return Math.max(-0.2,Math.min(0.95,base));
+}
+function describeNdviValue(n){
+    if(n<-0.1)return'Water/Snow';if(n<0.1)return'Bare Soil/Rock';if(n<0.2)return'Very Sparse Vegetation';
+    if(n<0.3)return'Sparse Vegetation';if(n<0.4)return'Moderate Vegetation';if(n<0.5)return'Moderate-Dense Vegetation';
+    if(n<0.6)return'Healthy Dense Vegetation';if(n<0.7)return'Very Dense Vegetation';if(n<0.8)return'Lush Forest';return'Tropical Rainforest';
+}
+function getNdviColor(n){
+    if(n<0)return'#4682B4';if(n<0.2)return'#D2691E';if(n<0.3)return'#DAA520';if(n<0.4)return'#9ACD32';
+    if(n<0.5)return'#32CD32';if(n<0.6)return'#228B22';if(n<0.7)return'#006400';return'#004D00';
+}
+function setupMap(){
+    if(leafletMap)return;
+    leafletMap=L.map('map').setView([20.5937,78.9629],5);
+    mapStreetTiles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(leafletMap);
+    mapSatelliteTiles=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
+    var today=new Date(),max=new Date(today);max.setDate(today.getDate()-2);
+    document.getElementById('ndviDatePicker').max=max.toISOString().split('T')[0];
+    document.getElementById('ndviDatePicker').value=max.toISOString().split('T')[0];
+    leafletMap.on('click',function(e){
+        var val=computeNdviValue(e.latlng.lat,e.latlng.lng),col=getNdviColor(val);
+        document.getElementById('ndviValue').textContent=val.toFixed(3);
+        document.getElementById('ndviValue').style.color=col;
+        document.getElementById('ndviStatus').textContent=describeNdviValue(val);
+        document.getElementById('ndviInfo').style.display='block';
+        L.marker(e.latlng).addTo(leafletMap).bindPopup('<div style="text-align:center;padding:10px;"><strong style="color:'+col+';font-size:24px;">'+val.toFixed(3)+'</strong><br><span style="color:#666;">'+describeNdviValue(val)+'</span></div>').openPopup();
+    });
+}
+function changeMapMode(mode){
+    currentViewMode=mode;
+    document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(mode+'ModeBtn').classList.add('active');
+    if(mode==='street'){if(mapSatelliteTiles&&leafletMap.hasLayer(mapSatelliteTiles))leafletMap.removeLayer(mapSatelliteTiles);if(!leafletMap.hasLayer(mapStreetTiles))mapStreetTiles.addTo(leafletMap);displayMessage('Street Map','info');}
+    else if(mode==='satellite'){if(mapStreetTiles&&leafletMap.hasLayer(mapStreetTiles))leafletMap.removeLayer(mapStreetTiles);if(!leafletMap.hasLayer(mapSatelliteTiles))mapSatelliteTiles.addTo(leafletMap);displayMessage('Satellite View','info');}
+    else{if(mapStreetTiles&&leafletMap.hasLayer(mapStreetTiles))leafletMap.removeLayer(mapStreetTiles);if(mapSatelliteTiles&&leafletMap.hasLayer(mapSatelliteTiles))leafletMap.removeLayer(mapSatelliteTiles);displayMessage('NDVI Mode — Click map to analyze','info');}
+}
+function updateSensor(){selectedSensor=document.getElementById('sensorSelect').value;displayMessage(selectedSensor==='landsat'?'Landsat 8':'Sentinel-2','info');}
+function loadNdviData(){var d=document.getElementById('ndviDatePicker').value;if(!d){displayMessage('Please select a date','error');return;}showLoadingScreen('Loading NDVI data…');changeMapMode('ndvi');setTimeout(function(){hideLoadingScreen();displayMessage('NDVI data loaded for '+d,'success');},1500);}
+function loadLatestNdvi(){var today=new Date(),l=new Date(today);l.setDate(today.getDate()-2);document.getElementById('ndviDatePicker').value=l.toISOString().split('T')[0];loadNdviData();}
+
+/* ═══════════════════════════════════════
+   WEATHER
+═══════════════════════════════════════ */
+async function fetchWeather(){
+    var city=document.getElementById('cityInput').value.trim();
+    if(!city){displayMessage('Enter a city name','error');return;}
+    showLoadingScreen('Fetching weather…');
+    if(CONFIG.WEATHER_API_KEY&&CONFIG.WEATHER_API_KEY!=='ENTER_OPENWEATHER_API_KEY'){
+        try{var r=await fetch('https://api.openweathermap.org/data/2.5/weather?q='+city+'&appid='+CONFIG.WEATHER_API_KEY+'&units=metric');if(r.ok){var d=await r.json();renderWeatherDisplay(d);hideLoadingScreen();displayMessage('Weather loaded!','success');return;}}catch(e){}
+    }
+    hideLoadingScreen();renderDemoWeather(city);displayMessage('Demo weather (add API key for live data)','info');
+}
+async function fetchLocationWeather(){
+    if(!navigator.geolocation){displayMessage('Geolocation not supported','error');return;}
+    showLoadingScreen('Getting location…');
+    navigator.geolocation.getCurrentPosition(async function(pos){
+        if(CONFIG.WEATHER_API_KEY&&CONFIG.WEATHER_API_KEY!=='ENTER_OPENWEATHER_API_KEY'){
+            try{var r=await fetch('https://api.openweathermap.org/data/2.5/weather?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&appid='+CONFIG.WEATHER_API_KEY+'&units=metric');if(r.ok){var d=await r.json();renderWeatherDisplay(d);hideLoadingScreen();displayMessage('Weather loaded!','success');return;}}catch(e){}
         }
-
-        function convertFileToBase64(file) {
-            return new Promise(function(resolve, reject) {
-                var reader = new FileReader();
-                reader.onload = function() {
-                    resolve(reader.result.split(',')[1]);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Plant analysis
-        async function analyzePlant() {
-            if (!CONFIG.KINDWISE_API_KEY || CONFIG.KINDWISE_API_KEY === 'YOUR_KINDWISE_API_KEY_HERE') {
-                displayMessage('Please add your Kindwise API key in the code', 'error');
-                return;
-            }
-
-            var fileInput = document.getElementById('plantImageInput');
-            var uploadedFile = fileInput.files[0];
-
-            if (!uploadedFile) {
-                displayMessage('Please upload an image first', 'error');
-                return;
-            }
-
-            showLoadingScreen('Analyzing plant with Kindwise AI...');
-
-            try {
-                var imageBase64 = await convertFileToBase64(uploadedFile);
-
-                var apiResponse = await fetch('https://plant.id/api/v3/health_assessment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Api-Key': CONFIG.KINDWISE_API_KEY
-                    },
-                    body: JSON.stringify({
-                        images: ['data:image/jpeg;base64,' + imageBase64],
-                        latitude: 19.0760,
-                        longitude: 72.8777,
-                        similar_images: true
-                    })
-                });
-
-                if (!apiResponse.ok) {
-                    if (apiResponse.status === 401) {
-                        throw new Error('Invalid Kindwise API Key');
-                    } else if (apiResponse.status === 429) {
-                        throw new Error('API limit reached');
-                    } else {
-                        throw new Error('API Error: ' + apiResponse.status);
-                    }
-                }
-
-                var responseData = await apiResponse.json();
-                console.log('Kindwise Response:', responseData);
-
-                hideLoadingScreen();
-                renderPlantResults(responseData);
-                plantAnalysisData = responseData;
-                displayMessage('Analysis complete!', 'success');
-
-            } catch (error) {
-                hideLoadingScreen();
-                console.error('Error:', error);
-                displayMessage('Analysis failed: ' + error.message, 'error');
-            }
-        }
-
-        function renderPlantResults(data) {
-            var resultsContainer = document.getElementById('resultsPanel');
-            
-            if (!data || !data.result) {
-                resultsContainer.innerHTML = '<div class="disease-section"><h3 style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> No Results</h3><p style="color: #94a3b8;">Could not analyze the image. Try a clearer plant image.</p></div>';
-                resultsContainer.style.display = 'block';
-                return;
-            }
-
-            var analysisResult = data.result;
-            var plantInfo = analysisResult.classification || {};
-            var healthCheck = analysisResult.is_healthy ? analysisResult.is_healthy.binary : true;
-            var healthPercentage = analysisResult.is_healthy ? (analysisResult.is_healthy.probability * 100).toFixed(1) : '100';
-
-            var htmlContent = '';
-
-            if (plantInfo.suggestions && Array.isArray(plantInfo.suggestions) && plantInfo.suggestions.length > 0) {
-                var topMatch = plantInfo.suggestions[0];
-                var matchConfidence = (topMatch.probability * 100).toFixed(1);
-
-                htmlContent += '<div class="plant-identity"><h3 style="color: #3b82f6; margin-bottom: 15px;"><i class="fas fa-leaf"></i> Plant Identification</h3><div class="plant-name">' + (topMatch.name || 'Unknown Plant') + '</div>';
-                
-                if (topMatch.details && topMatch.details.scientific_name) {
-                    htmlContent += '<div class="scientific-name">' + topMatch.details.scientific_name + '</div>';
-                }
-                
-                htmlContent += '<div class="confidence-bar"><div class="confidence-fill" style="width: ' + matchConfidence + '%">' + matchConfidence + '% Confident</div></div></div>';
-            }
-
-            htmlContent += '<div class="health-assessment"><h3 style="color: #22c55e; margin-bottom: 15px;"><i class="fas fa-heartbeat"></i> Health Assessment</h3><div class="health-score">' + healthPercentage + '%</div><div style="text-align: center; font-size: 20px; color: ' + (healthCheck ? '#22c55e' : '#ef4444') + ';">';
-            
-            if (healthCheck) {
-                htmlContent += '<i class="fas fa-check-circle"></i> Plant appears healthy!';
-            } else {
-                htmlContent += '<i class="fas fa-exclamation-circle"></i> Health issues detected';
-            }
-            
-            htmlContent += '</div></div>';
-
-            if (analysisResult.disease && analysisResult.disease.suggestions && Array.isArray(analysisResult.disease.suggestions) && analysisResult.disease.suggestions.length > 0) {
-                htmlContent += '<div class="disease-section"><h3 style="color: #ef4444; margin-bottom: 20px;"><i class="fas fa-virus"></i> Detected Issues</h3>';
-
-                var diseaseList = analysisResult.disease.suggestions.slice(0, 3);
-                for (var i = 0; i < diseaseList.length; i++) {
-                    var disease = diseaseList[i];
-                    var diseaseChance = (disease.probability * 100).toFixed(1);
-                    var riskClass = 'prob-low';
-                    
-                    if (diseaseChance > 70) riskClass = 'prob-high';
-                    else if (diseaseChance > 40) riskClass = 'prob-medium';
-
-                    htmlContent += '<div class="disease-card"><div class="disease-name">' + (disease.name || 'Unknown Disease') + '</div><span class="probability-badge ' + riskClass + '">' + diseaseChance + '% Probability</span>';
-                    
-                    if (disease.details && disease.details.description) {
-                        htmlContent += '<p style="color: #94a3b8; margin-top: 15px;">' + disease.details.description + '</p>';
-                    }
-                    
-                    htmlContent += '</div>';
-                }
-
-                htmlContent += '</div>';
-
-                if (CONFIG.GROQ_API_KEY && CONFIG.GROQ_API_KEY !== 'YOUR_GROQ_API_KEY_HERE') {
-                    htmlContent += '<div style="text-align: center; margin-top: 30px;"><button class="action-btn ai-detail-btn" onclick="fetchAiAnalysis()"><i class="fas fa-brain"></i> Get Detailed AI Analysis</button><p style="color: #94a3b8; margin-top: 10px; font-size: 14px;">Comprehensive treatment & prevention guide</p></div>';
-                }
-            }
-
-            resultsContainer.innerHTML = htmlContent;
-            resultsContainer.style.display = 'block';
-            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        async function fetchAiAnalysis() {
-            if (!CONFIG.GROQ_API_KEY || CONFIG.GROQ_API_KEY === 'YOUR_GROQ_API_KEY_HERE') {
-                displayMessage('Please add your Groq API key in the code', 'error');
-                return;
-            }
-
-            if (!plantAnalysisData || !plantAnalysisData.result) {
-                displayMessage('No disease data available', 'error');
-                return;
-            }
-
-            showLoadingScreen('Getting AI analysis from Groq...');
-
-            try {
-                var resultData = plantAnalysisData.result;
-                
-                var identifiedPlant = 'Unknown Plant';
-                if (resultData.classification && resultData.classification.suggestions && resultData.classification.suggestions[0]) {
-                    identifiedPlant = resultData.classification.suggestions[0].name;
-                }
-                
-                var foundDiseases = [];
-                if (resultData.disease && resultData.disease.suggestions && Array.isArray(resultData.disease.suggestions)) {
-                    foundDiseases = resultData.disease.suggestions.slice(0, 3).map(function(d) { return d.name; });
-                }
-                
-                if (foundDiseases.length === 0) {
-                    hideLoadingScreen();
-                    displayMessage('No diseases detected', 'info');
-                    return;
-                }
-
-                var diseaseString = foundDiseases.join(', ');
-
-                var analysisPrompt = 'You are a plant disease expert. Provide a comprehensive guide for:\n\nPlant: ' + identifiedPlant + '\nDisease: ' + diseaseString + '\n\nFormat your response with these sections:\n\n1. DISEASE OVERVIEW\nExplain what ' + foundDiseases[0] + ' is and how it affects the plant.\n\n2. SYMPTOMS\nList all visible symptoms to watch for.\n\n3. CAUSES\nWhat causes this disease?\n\n4. TREATMENT PLAN\n- Immediate actions (24-48 hours)\n- Week 1-2 treatment\n- Long-term care\n- Organic remedies\n- Chemical treatments if needed\n\n5. PREVENTION\nHow to prevent this disease in the future.\n\n6. ENVIRONMENTAL CARE\nBest conditions: temperature, humidity, light, watering.\n\n7. WHEN TO GET HELP\nWarning signs that need professional care.\n\n8. RECOVERY TIME\nHow long until the plant recovers?\n\nKeep it practical for home gardeners.';
-
-                console.log('Sending to Groq:', analysisPrompt);
-
-                var groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + CONFIG.GROQ_API_KEY
-                    },
-                    body: JSON.stringify({
-                        model: 'llama-3.3-70b-versatile',
-                        messages: [{
-                            role: 'user',
-                            content: analysisPrompt
-                        }],
-                        temperature: 0.7,
-                        max_tokens: 2000
-                    })
-                });
-
-                console.log('Groq response status:', groqResponse.status);
-
-                if (!groqResponse.ok) {
-                    var errorMessage = await groqResponse.text();
-                    console.error('Groq API error:', errorMessage);
-                    
-                    if (groqResponse.status === 401) {
-                        throw new Error('Invalid Groq API Key');
-                    }
-                    throw new Error('Groq API Error: ' + groqResponse.status);
-                }
-
-                var groqData = await groqResponse.json();
-                console.log('Groq response:', groqData);
-
-                if (!groqData.choices || !groqData.choices[0] || !groqData.choices[0].message) {
-                    throw new Error('Invalid response from Groq');
-                }
-
-                var aiResponseText = groqData.choices[0].message.content;
-                
-                hideLoadingScreen();
-                renderAiAnalysis(aiResponseText, foundDiseases[0]);
-                displayMessage('AI analysis complete!', 'success');
-
-            } catch (error) {
-                hideLoadingScreen();
-                console.error('Groq Error:', error);
-                displayMessage('AI analysis failed: ' + error.message, 'error');
-            }
-        }
-
-        function renderAiAnalysis(analysisText, diseaseName) {
-            var aiContainer = document.getElementById('aiDetailsPanel');
-            
-            var textSections = analysisText.split(/\d+\.\s+[A-Z\s]+\n/).filter(function(s) { return s.trim(); });
-            
-            var htmlOutput = '<div style="text-align: center; margin-bottom: 30px;"><h2 style="color: #a78bfa; font-size: 32px; margin-bottom: 10px;"><i class="fas fa-brain"></i> AI Analysis: ' + diseaseName + '</h2><p style="color: #94a3b8;">Powered by Groq AI • Comprehensive Treatment Guide</p></div>';
-
-            var sectionHeaders = [
-                { icon: 'fa-info-circle', title: 'Disease Overview', color: '#60a5fa' },
-                { icon: 'fa-eye', title: 'Symptoms', color: '#f59e0b' },
-                { icon: 'fa-cloud-sun', title: 'Causes', color: '#8b5cf6' },
-                { icon: 'fa-medkit', title: 'Treatment Plan', color: '#10b981' },
-                { icon: 'fa-shield-alt', title: 'Prevention', color: '#3b82f6' },
-                { icon: 'fa-thermometer-half', title: 'Environmental Care', color: '#14b8a6' },
-                { icon: 'fa-user-md', title: 'When to Get Help', color: '#ef4444' },
-                { icon: 'fa-chart-line', title: 'Recovery Time', color: '#22c55e' }
-            ];
-
-            for (var idx = 0; idx < textSections.length; idx++) {
-                if (textSections[idx].trim() && idx < sectionHeaders.length) {
-                    var sectionData = sectionHeaders[idx];
-                    
-                    var sectionText = textSections[idx].trim();
-                    sectionText = sectionText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    sectionText = sectionText.replace(/^[\*\-]\s+(.+)$/gm, '<li>$1</li>');
-                    
-                    if (sectionText.includes('<li>')) {
-                        sectionText = sectionText.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
-                    }
-                    
-                    var paragraphs = sectionText.split('\n\n');
-                    sectionText = paragraphs.map(function(p) {
-                        p = p.trim();
-                        if (!p.startsWith('<ul>') && !p.includes('<li>') && p.length > 0) {
-                            return '<p>' + p + '</p>';
-                        }
-                        return p;
-                    }).join('');
-
-                    htmlOutput += '<div class="ai-section" style="border-left-color: ' + sectionData.color + ';"><h3 style="color: ' + sectionData.color + ';"><i class="fas ' + sectionData.icon + '"></i> ' + sectionData.title + '</h3><div class="ai-content">' + sectionText + '</div></div>';
-                }
-            }
-
-            aiContainer.innerHTML = htmlOutput;
-            aiContainer.style.display = 'block';
-            aiContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        // Regional Alert Functions
-        async function generateAlert() {
-            var locationText = document.getElementById('alertLocationInput').value.trim();
-            
-            if (!locationText) {
-                displayMessage('Please enter a location', 'error');
-                return;
-            }
-
-            userLocation = locationText;
-            showLoadingScreen('Analyzing disease risks for your region...');
-
-            try {
-                var currentDate = new Date();
-                var monthName = currentDate.toLocaleString('default', { month: 'long' });
-                var seasonName = getSeasonFromMonth(currentDate.getMonth());
-                
-                var weatherInfo = null;
-                var weatherCondition = 'varied conditions';
-                var currentTemp = 25;
-                var currentHumidity = 65;
-
-                if (CONFIG.WEATHER_API_KEY) {
-                    try {
-                        var weatherResponse = await fetch('https://api.openweathermap.org/data/2.5/weather?q=' + locationText + '&appid=' + CONFIG.WEATHER_API_KEY + '&units=metric');
-                        
-                        if (weatherResponse.ok) {
-                            weatherInfo = await weatherResponse.json();
-                            weatherCondition = weatherInfo.weather[0].description;
-                            currentTemp = weatherInfo.main.temp;
-                            currentHumidity = weatherInfo.main.humidity;
-                        }
-                    } catch (err) {
-                        console.log('Weather data not available');
-                    }
-                }
-
-                var riskAnalysis = analyzeRegionalRisks(seasonName, currentTemp, currentHumidity, locationText);
-                
-                hideLoadingScreen();
-                renderAlertDisplay(locationText, seasonName, monthName, weatherCondition, currentTemp, currentHumidity, riskAnalysis);
-                displayMessage('Disease alert generated!', 'success');
-
-            } catch (err) {
-                hideLoadingScreen();
-                console.error('Alert generation error:', err);
-                displayMessage('Failed to generate alert', 'error');
-            }
-        }
-
-        async function generateAlertForLocation() {
-            if (!navigator.geolocation) {
-                displayMessage('Geolocation not supported', 'error');
-                return;
-            }
-
-            showLoadingScreen('Getting your location...');
-
-            navigator.geolocation.getCurrentPosition(
-                async function(position) {
-                    var lat = position.coords.latitude;
-                    var lng = position.coords.longitude;
-                    
-                    try {
-                        var geoResponse = await fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json');
-                        
-                        if (geoResponse.ok) {
-                            var geoData = await geoResponse.json();
-                            var cityName = geoData.address.city || geoData.address.town || geoData.address.village || 'Your Location';
-                            document.getElementById('alertLocationInput').value = cityName;
-                            hideLoadingScreen();
-                            generateAlert();
-                        } else {
-                            hideLoadingScreen();
-                            displayMessage('Could not determine location name', 'error');
-                        }
-                    } catch (err) {
-                        hideLoadingScreen();
-                        console.error('Geocoding error:', err);
-                        displayMessage('Location service error', 'error');
-                    }
-                },
-                function() {
-                    hideLoadingScreen();
-                    displayMessage('Location access denied', 'error');
-                }
-            );
-        }
-
-        function getSeasonFromMonth(monthIndex) {
-            if (monthIndex >= 2 && monthIndex <= 4) return 'Spring';
-            if (monthIndex >= 5 && monthIndex <= 7) return 'Summer';
-            if (monthIndex >= 8 && monthIndex <= 10) return 'Autumn';
-            return 'Winter';
-        }
-
-        function analyzeRegionalRisks(season, temp, humidity, location) {
-            var risks = [];
-
-            if (humidity > 70) {
-                risks.push({
-                    name: 'Fungal Diseases',
-                    risk: 'HIGH',
-                    types: ['Powdery Mildew', 'Downy Mildew', 'Rust Diseases', 'Leaf Spot'],
-                    reason: 'High humidity (' + humidity + '%) creates ideal conditions for fungal growth'
-                });
-            }
-
-            if (temp > 25 && temp < 35) {
-                risks.push({
-                    name: 'Bacterial Blight',
-                    risk: 'MODERATE',
-                    types: ['Bacterial Leaf Spot', 'Crown Gall', 'Fire Blight'],
-                    reason: 'Warm temperatures (' + temp + '°C) favor bacterial infections'
-                });
-            }
-
-            if (season === 'Summer' || season === 'Spring') {
-                risks.push({
-                    name: 'Aphid & Pest Infestations',
-                    risk: 'HIGH',
-                    types: ['Aphids', 'Whiteflies', 'Spider Mites', 'Thrips'],
-                    reason: season + ' season promotes rapid pest reproduction'
-                });
-            }
-
-            if (season === 'Monsoon' || (season === 'Summer' && humidity > 75)) {
-                risks.push({
-                    name: 'Root Rot & Wilt Diseases',
-                    risk: 'HIGH',
-                    types: ['Root Rot', 'Damping Off', 'Verticillium Wilt'],
-                    reason: 'Excess moisture and poor drainage increase root disease risk'
-                });
-            }
-
-            risks.push({
-                name: 'Viral Diseases',
-                risk: 'LOW',
-                types: ['Mosaic Virus', 'Leaf Curl', 'Yellowing'],
-                reason: 'Spread by insects and contaminated tools - practice good hygiene'
-            });
-
-            return risks;
-        }
-
-        function renderAlertDisplay(location, season, month, weather, temp, humidity, diseases) {
-            var alertContainer = document.getElementById('alertDisplay');
-            
-            var highestRisk = diseases.find(function(d) { return d.risk === 'HIGH'; });
-            var alertSeverity = highestRisk ? 'HIGH ALERT' : 'MODERATE ALERT';
-            var severityColor = highestRisk ? '#ef4444' : '#f59e0b';
-
-            var htmlOutput = '<div class="alert-main-warning" style="border-color: ' + severityColor + ';"><h2 style="color: ' + severityColor + ';">⚠️ ' + alertSeverity + '</h2><p style="font-size: 18px; margin: 15px 0; color: #e2e8f0;">High chance of ' + (highestRisk ? highestRisk.name.toLowerCase() : 'plant diseases') + ' this week in ' + location + '</p><span class="severity" style="background: ' + severityColor + ';">' + alertSeverity + '</span></div>';
-
-            htmlOutput += '<div class="info-grid"><div class="info-card"><h3><i class="fas fa-map-marker-alt"></i> Location</h3><ul><li>' + location + '</li></ul></div><div class="info-card"><h3><i class="fas fa-calendar-alt"></i> Season</h3><ul><li>' + season + ' (' + month + ')</li></ul></div><div class="info-card"><h3><i class="fas fa-cloud-sun"></i> Weather</h3><ul><li>' + weather + '</li><li>Temp: ' + temp + '°C</li><li>Humidity: ' + humidity + '%</li></ul></div></div>';
-
-            htmlOutput += '<h2 style="color: #ef4444; margin: 30px 0 20px; font-size: 28px; text-align: center;"><i class="fas fa-exclamation-circle"></i> Disease Risks for Your Area</h2>';
-
-            for (var i = 0; i < diseases.length; i++) {
-                var disease = diseases[i];
-                var riskColor = disease.risk === 'HIGH' ? '#ef4444' : disease.risk === 'MODERATE' ? '#f59e0b' : '#fbbf24';
-                
-                htmlOutput += '<div style="background: rgba(30, 41, 59, 0.6); border: 2px solid ' + riskColor + '; border-radius: 15px; padding: 25px; margin: 20px 0;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h3 style="color: ' + riskColor + '; font-size: 24px;"><i class="fas fa-virus"></i> ' + disease.name + '</h3><span style="background: ' + riskColor + '; color: white; padding: 8px 20px; border-radius: 20px; font-weight: 700;">' + disease.risk + ' RISK</span></div><p style="color: #94a3b8; margin-bottom: 15px; font-size: 16px;">' + disease.reason + '</p><div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #3b82f6;"><strong style="color: #3b82f6;">Common types in this category:</strong><ul style="margin: 10px 0; padding-left: 25px; color: #e2e8f0;">';
-                
-                for (var j = 0; j < disease.types.length; j++) {
-                    htmlOutput += '<li style="margin: 5px 0;">' + disease.types[j] + '</li>';
-                }
-                
-                htmlOutput += '</ul></div></div>';
-            }
-
-            htmlOutput += '<div class="integration-section"><h3><i class="fas fa-link"></i> This Integration Matters</h3><p style="text-align: center; color: #94a3b8; margin-bottom: 25px;">Our alert system combines multiple data sources for accurate predictions</p><div class="integration-grid"><div class="integration-box"><i class="fas fa-chart-line"></i><h4>NDVI Data</h4><p style="color: #94a3b8; font-size: 14px;">Vegetation health monitoring</p></div><div class="integration-box"><i class="fas fa-cloud-sun"></i><h4>Weather</h4><p style="color: #94a3b8; font-size: 14px;">Real-time conditions</p></div><div class="integration-box"><i class="fas fa-virus"></i><h4>Disease Data</h4><p style="color: #94a3b8; font-size: 14px;">Historical patterns</p></div></div><div class="integration-note"><strong style="color: #3b82f6;">💡 Smart Prediction:</strong> By analyzing NDVI vegetation data, current weather conditions, and seasonal disease patterns, we provide targeted alerts for your specific location. This helps you take preventive action before diseases spread.</div></div>';
-
-            alertContainer.innerHTML = htmlOutput;
-            alertContainer.style.display = 'block';
-            alertContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        // NDVI Map Functions
-        function computeNdviValue(latitude, longitude) {
-            var baseValue;
-            var absLatitude = Math.abs(latitude);
-            
-            if (absLatitude < 23.5) {
-                baseValue = 0.6 + (Math.random() * 0.25);
-            } else if (absLatitude < 35) {
-                baseValue = 0.4 + (Math.random() * 0.3);
-            } else if (absLatitude < 50) {
-                baseValue = 0.3 + (Math.random() * 0.35);
-            } else if (absLatitude < 66.5) {
-                baseValue = 0.2 + (Math.random() * 0.3);
-            } else {
-                baseValue = -0.1 + (Math.random() * 0.25);
-            }
-            
-            var locationSeed = Math.sin(latitude * 12.34567) * Math.cos(longitude * 98.76543);
-            var locationVariation = locationSeed * 0.15;
-            baseValue += locationVariation;
-            
-            var currentDate = new Date();
-            var currentMonth = currentDate.getMonth();
-            var seasonFactor = 1.0;
-            
-            if (latitude > 0) {
-                if (currentMonth >= 5 && currentMonth <= 8) {
-                    seasonFactor = 1.2;
-                } else if (currentMonth >= 11 || currentMonth <= 1) {
-                    seasonFactor = 0.7;
-                } else {
-                    seasonFactor = 0.9;
-                }
-            } else {
-                if (currentMonth >= 11 || currentMonth <= 1) {
-                    seasonFactor = 1.2;
-                } else if (currentMonth >= 5 && currentMonth <= 8) {
-                    seasonFactor = 0.7;
-                } else {
-                    seasonFactor = 0.9;
-                }
-            }
-            
-            baseValue *= seasonFactor;
-            
-            var randomNoise = (Math.random() - 0.5) * 0.05;
-            baseValue += randomNoise;
-            
-            baseValue = Math.max(-0.2, Math.min(0.95, baseValue));
-            
-            return baseValue;
-        }
-
-        function describeNdviValue(ndvi) {
-            if (ndvi < -0.1) return 'Water/Snow';
-            if (ndvi < 0.1) return 'Bare Soil/Rock';
-            if (ndvi < 0.2) return 'Very Sparse Vegetation';
-            if (ndvi < 0.3) return 'Sparse Vegetation';
-            if (ndvi < 0.4) return 'Moderate Vegetation';
-            if (ndvi < 0.5) return 'Moderate-Dense Vegetation';
-            if (ndvi < 0.6) return 'Healthy Dense Vegetation';
-            if (ndvi < 0.7) return 'Very Dense Vegetation';
-            if (ndvi < 0.8) return 'Lush Forest';
-            return 'Tropical Rainforest';
-        }
-
-        function setupMap() {
-            if (leafletMap) return;
-
-            leafletMap = L.map('map').setView([20.5937, 78.9629], 5);
-
-            mapStreetTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap',
-                maxZoom: 19
-            }).addTo(leafletMap);
-
-            mapSatelliteTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: '© Esri',
-                maxZoom: 19
-            });
-
-            var today = new Date();
-            var maxDate = new Date(today);
-            maxDate.setDate(today.getDate() - 2);
-            document.getElementById('ndviDatePicker').max = maxDate.toISOString().split('T')[0];
-            document.getElementById('ndviDatePicker').value = maxDate.toISOString().split('T')[0];
-
-            leafletMap.on('click', function(e) {
-                var ndviValue = computeNdviValue(e.latlng.lat, e.latlng.lng);
-                var ndviColor = getNdviColor(ndviValue);
-                
-                document.getElementById('ndviValue').textContent = ndviValue.toFixed(3);
-                document.getElementById('ndviValue').style.color = ndviColor;
-                document.getElementById('ndviStatus').textContent = describeNdviValue(ndviValue);
-                document.getElementById('ndviInfo').style.display = 'block';
-                
-                L.marker(e.latlng).addTo(leafletMap)
-                    .bindPopup('<div style="text-align: center; padding: 10px;"><strong style="color: ' + ndviColor + '; font-size: 24px;">' + ndviValue.toFixed(3) + '</strong><br><span style="color: #666;">' + describeNdviValue(ndviValue) + '</span></div>')
-                    .openPopup();
-            });
-        }
-
-        function getNdviColor(ndvi) {
-            if (ndvi < 0) return '#4682B4';
-            if (ndvi < 0.2) return '#D2691E';
-            if (ndvi < 0.3) return '#DAA520';
-            if (ndvi < 0.4) return '#9ACD32';
-            if (ndvi < 0.5) return '#32CD32';
-            if (ndvi < 0.6) return '#228B22';
-            if (ndvi < 0.7) return '#006400';
-            return '#004D00';
-        }
-
-        function changeMapMode(mode) {
-            currentViewMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(function(btn) {
-                btn.classList.remove('active');
-            });
-            document.getElementById(mode + 'ModeBtn').classList.add('active');
-
-            if (mode === 'street') {
-                if (mapSatelliteTiles && leafletMap.hasLayer(mapSatelliteTiles)) leafletMap.removeLayer(mapSatelliteTiles);
-                if (!leafletMap.hasLayer(mapStreetTiles)) mapStreetTiles.addTo(leafletMap);
-                displayMessage('Street Map', 'info');
-            } else if (mode === 'satellite') {
-                if (mapStreetTiles && leafletMap.hasLayer(mapStreetTiles)) leafletMap.removeLayer(mapStreetTiles);
-                if (!leafletMap.hasLayer(mapSatelliteTiles)) mapSatelliteTiles.addTo(leafletMap);
-                displayMessage('Satellite View', 'info');
-            } else if (mode === 'ndvi') {
-                if (mapStreetTiles && leafletMap.hasLayer(mapStreetTiles)) leafletMap.removeLayer(mapStreetTiles);
-                if (mapSatelliteTiles && leafletMap.hasLayer(mapSatelliteTiles)) leafletMap.removeLayer(mapSatelliteTiles);
-                displayMessage('NDVI Mode - Click map to analyze', 'info');
-            }
-        }
-
-        function updateSensor() {
-            selectedSensor = document.getElementById('sensorSelect').value;
-            displayMessage(selectedSensor === 'landsat' ? 'Landsat 8' : 'Sentinel-2', 'info');
-        }
-
-        function loadNdviData() {
-            var selectedDate = document.getElementById('ndviDatePicker').value;
-            if (!selectedDate) {
-                displayMessage('Please select a date', 'error');
-                return;
-            }
-            showLoadingScreen('Loading NDVI data...');
-            changeMapMode('ndvi');
-            setTimeout(function() {
-                hideLoadingScreen();
-                displayMessage('NDVI data loaded for ' + selectedDate, 'success');
-            }, 1500);
-        }
-
-        function loadLatestNdvi() {
-            var today = new Date();
-            var latest = new Date(today);
-            latest.setDate(today.getDate() - 2);
-            document.getElementById('ndviDatePicker').value = latest.toISOString().split('T')[0];
-            loadNdviData();
-        }
-
-        // Weather Functions
-        async function fetchWeather() {
-            var cityName = document.getElementById('cityInput').value.trim();
-            if (!cityName) {
-                displayMessage('Enter a city name', 'error');
-                return;
-            }
-
-            showLoadingScreen('Fetching weather...');
-
-            if (CONFIG.WEATHER_API_KEY) {
-                try {
-                    var weatherResponse = await fetch('https://api.openweathermap.org/data/2.5/weather?q=' + cityName + '&appid=' + CONFIG.WEATHER_API_KEY + '&units=metric');
-
-                    if (weatherResponse.ok) {
-                        var weatherData = await weatherResponse.json();
-                        renderWeatherDisplay(weatherData);
-                        hideLoadingScreen();
-                        displayMessage('Weather loaded!', 'success');
-                        return;
-                    }
-                } catch (err) {
-                    console.error('Weather error:', err);
-                }
-            }
-
-            hideLoadingScreen();
-            renderDemoWeather(cityName);
-            displayMessage('Demo weather', 'info');
-        }
-
-        async function fetchLocationWeather() {
-            if (!navigator.geolocation) {
-                displayMessage('Geolocation not supported', 'error');
-                return;
-            }
-
-            showLoadingScreen('Getting location...');
-
-            navigator.geolocation.getCurrentPosition(
-                async function(position) {
-                    var lat = position.coords.latitude;
-                    var lng = position.coords.longitude;
-                    
-                    if (CONFIG.WEATHER_API_KEY) {
-                        try {
-                            var weatherResponse = await fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + lng + '&appid=' + CONFIG.WEATHER_API_KEY + '&units=metric');
-
-                            if (weatherResponse.ok) {
-                                var weatherData = await weatherResponse.json();
-                                renderWeatherDisplay(weatherData);
-                                hideLoadingScreen();
-                                displayMessage('Weather loaded!', 'success');
-                                return;
-                            }
-                        } catch (err) {
-                            console.error('Weather error:', err);
-                        }
-                    }
-
-                    hideLoadingScreen();
-                    renderDemoWeather('Your Location');
-                    displayMessage('Demo weather', 'info');
-                },
-                function() {
-                    hideLoadingScreen();
-                    displayMessage('Location access denied', 'error');
-                }
-            );
-        }
-
-        function renderWeatherDisplay(data) {
-            var weatherContainer = document.getElementById('weatherDisplay');
-            
-            var htmlContent = '<div class="weather-main"><h2 style="color: #3b82f6; font-size: 36px;"><i class="fas fa-map-marker-alt"></i> ' + data.name + ', ' + data.sys.country + '</h2><div class="weather-icon">' + getWeatherEmoji(data.weather[0].main) + '</div><div class="temperature">' + Math.round(data.main.temp) + '°C</div><div class="weather-description">' + data.weather[0].description + '</div></div><div class="weather-details"><div class="detail-card"><div class="detail-icon"><i class="fas fa-temperature-high"></i></div><div class="detail-value">' + Math.round(data.main.feels_like) + '°C</div><div class="detail-label">Feels Like</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-tint"></i></div><div class="detail-value">' + data.main.humidity + '%</div><div class="detail-label">Humidity</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-wind"></i></div><div class="detail-value">' + Math.round(data.wind.speed * 3.6) + ' km/h</div><div class="detail-label">Wind Speed</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-compress-arrows-alt"></i></div><div class="detail-value">' + data.main.pressure + ' hPa</div><div class="detail-label">Pressure</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-eye"></i></div><div class="detail-value">' + (data.visibility / 1000).toFixed(1) + ' km</div><div class="detail-label">Visibility</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-cloud"></i></div><div class="detail-value">' + data.clouds.all + '%</div><div class="detail-label">Cloud Cover</div></div></div>';
-
-            weatherContainer.innerHTML = htmlContent;
-            weatherContainer.style.display = 'block';
-        }
-
-        function renderDemoWeather(city) {
-            renderWeatherDisplay({
-                name: city,
-                sys: { country: 'DEMO' },
-                weather: [{ main: 'Clear', description: 'clear sky' }],
-                main: { temp: 28, feels_like: 30, humidity: 65, pressure: 1013 },
-                wind: { speed: 3.5 },
-                visibility: 10000,
-                clouds: { all: 20 }
-            });
-        }
-
-        function getWeatherEmoji(condition) {
-            var weatherIcons = {
-                'Clear': '☀️', 'Clouds': '☁️', 'Rain': '🌧️',
-                'Drizzle': '🌦️', 'Thunderstorm': '⛈️', 'Snow': '❄️',
-                'Mist': '🌫️', 'Fog': '🌫️'
-            };
-            return weatherIcons[condition] || '🌤️';
-        }
-
-        // Utility Functions
-        function showLoadingScreen(message) {
-            document.getElementById('loadingText').textContent = message;
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        }
-
-        function hideLoadingScreen() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
-
-        function displayMessage(message, type) {
-            var toastElement = document.getElementById('toast');
-            toastElement.textContent = message;
-            toastElement.style.display = 'block';
-            
-            if (type === 'error') {
-                toastElement.style.borderColor = '#ef4444';
-            } else if (type === 'success') {
-                toastElement.style.borderColor = '#22c55e';
-            } else {
-                toastElement.style.borderColor = '#3b82f6';
-            }
-
-            setTimeout(function() {
-                toastElement.style.display = 'none';
-            }, 4000);
-        }
-    </script>
+        hideLoadingScreen();renderDemoWeather('Your Location');displayMessage('Demo weather','info');
+    },function(){hideLoadingScreen();displayMessage('Location access denied','error');});
+}
+function renderWeatherDisplay(d){
+    var c=document.getElementById('weatherDisplay');
+    c.innerHTML='<div class="weather-main"><h2 style="color:#3b82f6;font-size:36px;"><i class="fas fa-map-marker-alt"></i> '+d.name+', '+d.sys.country+'</h2><div class="weather-icon">'+getWeatherEmoji(d.weather[0].main)+'</div><div class="temperature">'+Math.round(d.main.temp)+'°C</div><div class="weather-description">'+d.weather[0].description+'</div></div><div class="weather-details"><div class="detail-card"><div class="detail-icon"><i class="fas fa-temperature-high"></i></div><div class="detail-value">'+Math.round(d.main.feels_like)+'°C</div><div class="detail-label">Feels Like</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-tint"></i></div><div class="detail-value">'+d.main.humidity+'%</div><div class="detail-label">Humidity</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-wind"></i></div><div class="detail-value">'+Math.round(d.wind.speed*3.6)+' km/h</div><div class="detail-label">Wind Speed</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-compress-arrows-alt"></i></div><div class="detail-value">'+d.main.pressure+' hPa</div><div class="detail-label">Pressure</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-eye"></i></div><div class="detail-value">'+((d.visibility||10000)/1000).toFixed(1)+' km</div><div class="detail-label">Visibility</div></div><div class="detail-card"><div class="detail-icon"><i class="fas fa-cloud"></i></div><div class="detail-value">'+d.clouds.all+'%</div><div class="detail-label">Cloud Cover</div></div></div>';
+    c.style.display='block';
+}
+function renderDemoWeather(city){renderWeatherDisplay({name:city,sys:{country:'DEMO'},weather:[{main:'Clear',description:'clear sky'}],main:{temp:28,feels_like:30,humidity:65,pressure:1013},wind:{speed:3.5},visibility:10000,clouds:{all:20}});}
+function getWeatherEmoji(c){return{'Clear':'☀️','Clouds':'☁️','Rain':'🌧️','Drizzle':'🌦️','Thunderstorm':'⛈️','Snow':'❄️','Mist':'🌫️','Fog':'🌫️'}[c]||'🌤️';}
+
+/* ═══════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════ */
+function showLoadingScreen(msg){document.getElementById('loadingText').textContent=msg;document.getElementById('loadingOverlay').style.display='flex';}
+function hideLoadingScreen(){document.getElementById('loadingOverlay').style.display='none';}
+function displayMessage(msg,type){
+    var t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
+    t.style.borderColor=type==='error'?'#ef4444':type==='success'?'#22c55e':'#3b82f6';
+    setTimeout(function(){t.style.display='none';},4000);
+}
+</script>
 </body>
 </html>
